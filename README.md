@@ -4,6 +4,8 @@ Covenant early warning for mid-sized companies ($10m to $500m of revenue).
 
 Built in one day at the Noetic x Nebius hackathon (Imperial College London, 24 October 2026) by Brian Liew and Matthan Coelho.
 
+**Live demo:** https://northstar-lovat-eight.vercel.app. To jump straight to a worked example, open [Hartley & Finch Packaging](https://northstar-lovat-eight.vercel.app/app?case=u-hartley-finch-packaging), a made-up UK firm that looks fine today but breaches its leverage covenant next quarter. The API sleeps when idle, so the first request after a quiet spell can fail once; try again.
+
 ## The problem
 
 Most business loans come with covenants: ratios the company promises to stay within, tested every quarter. Break one and the bank can reprice the loan, charge a waiver fee or call it in.
@@ -14,9 +16,11 @@ Large corporates have treasury teams and expensive systems watching these number
 
 You upload three things:
 
-1. The loan agreement (`.htm` or `.txt`)
-2. Management accounts in Excel, with account names down the side and months or quarters across
+1. The loan agreement (`.pdf`, `.htm` or `.txt`)
+2. Management accounts (Excel or PDF), with account names down the side and months or quarters across
 3. Optionally, a budget in the same layout
+
+PDF tables are read deterministically, never by the model. Scanned PDFs with no text layer are refused.
 
 NorthStar then:
 
@@ -40,7 +44,7 @@ The rule we built around: **the language model never produces a number you see o
 
 We replayed **Nortech Systems** (US electronics manufacturer, about $120m revenue, one bank, no PE owner) quarter by quarter from its SEC filings.
 
-At 30 September 2024, leverage was 1.74x against a 2.50x limit: 30% headroom, which looks fine. NorthStar's forecast already showed a breach in Q1 2025. In reality Nortech breached at the very next test (Q4 2024) and again in Q1 2025, and needed four covenant amendments in under two years. The Track record tab shows the full replay alongside quotes from the filings.
+At 30 September 2024, leverage was 1.74x against a 2.50x limit: 30% headroom, which looks fine. NorthStar's forecast already showed a breach in Q1 2025. In reality Nortech breached at the very next test (Q4 2024) and again in Q1 2025, and needed four covenant amendments in under two years. The landing page walks through the replay alongside quotes from the filings.
 
 ## Open vs closed models
 
@@ -73,7 +77,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open http://localhost:3000 for the landing page and http://localhost:3000/app for the app.
 
 `.env` needs:
 
@@ -84,6 +88,13 @@ Open http://localhost:3000.
 If `~/.secrets/headroom.env` exists it is used instead of `.env`, for keeping keys out of a synced folder.
 
 Tests: `python -m pytest -q` from the repo root, and `npx tsc --noEmit` in `web/`.
+
+## Hosting
+
+The live demo runs the API on Railway and the web app on Vercel.
+
+- **API (Railway).** `railpack.json` holds the start command. Mount a volume and set `HEADROOM_STATE` to its path: uploads and caches are written there instead of `data/`, and on first start `seed/` copies in the Hartley & Finch example and its market cache. Set `NEBIUS_API_KEY`, `TAVILY_API_KEY` and `CORS_ORIGINS` (the web app's URL). `RATE_LIMIT_HOURLY` and `RATE_LIMIT_DAILY` cap the calls that cost money (uploads, questions, uncached market searches) per visitor per hour and in total per day; leave them unset to switch limits off, as in local runs.
+- **Web (Vercel).** Deploy `web/` with `NEXT_PUBLIC_API` set to the API's URL. `/app?case=<name>` opens a company directly.
 
 ## Try it with real files
 
@@ -96,7 +107,7 @@ Tests: `python -m pytest -q` from the repo root, and `npx tsc --noEmit` in `web/
 | `eastern/` | The Eastern Company (real) | 2023 credit agreement, quarterly accounts to Jun 2025 |
 | `ashby_rowe/` | Ashby & Rowe Engineering (made up) | UK facility agreement, monthly bookkeeper accounts, a budget |
 
-The real companies' figures come from their SEC XBRL filings; amounts are in thousands of dollars. If you'd rather not upload anything, the Upload screen has two sample-company links.
+The real companies' figures come from their SEC XBRL filings; amounts are in thousands of dollars. If you'd rather not pick files, the Upload screen's "Autofill with sample data" button fills in the Ashby & Rowe pack for you.
 
 ## Limitations
 
@@ -105,6 +116,7 @@ The real companies' figures come from their SEC XBRL filings; amounts are in tho
 - **The chat has no memory.** Each question is answered on its own.
 - **Some agreements may have been amended since filing.** The Transcat pack uses its 2021 agreement.
 - **"Deployable privately", not "never leaves your machine".** The hosted demo sends excerpts and account names to Token Factory. Open weights mean a company could run the same models inside its own environment.
+- **The live demo is shared and rate-limited.** Anything uploaded there can be opened by anyone who knows the company name, and uploading a company with the same name replaces it. Don't upload real accounts.
 
 ## Repo layout
 
@@ -117,6 +129,7 @@ web/            Next.js front end
 bench/          open vs closed benchmark
 demo_files/     upload packs (see above)
 data/           built-in cases and source filings
+seed/           example case copied into a hosted deployment's empty volume
 scripts/        builders for the sample data and demo packs
 tests/          pytest suite
 docs/           design spec, build plan, demo script

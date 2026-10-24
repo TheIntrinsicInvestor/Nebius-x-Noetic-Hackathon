@@ -11,7 +11,7 @@ export function Card({ title, aside, children, className = "" }: {
     <section className={`rounded-lg border border-line bg-surface ${className}`}>
       {(title || aside) && (
         <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
-          <h2 className="text-[13px] font-semibold tracking-tight text-ink">{title}</h2>
+          <h2 className="font-serif text-[16px] font-semibold text-ink">{title}</h2>
           {aside && <div className="text-xs text-muted">{aside}</div>}
         </header>
       )}

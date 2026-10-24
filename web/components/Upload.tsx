@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createCompany, errorMessage } from "@/lib/api";
 import { comparatorLabel, covValue, kindLabel, modelName, quarterLabel, seconds, usd } from "@/lib/format";
 import type { CaseName, CompanyResponse } from "@/lib/types";
@@ -105,8 +105,9 @@ export default function Upload({ onLoad, loading, error }: {
             disabled={!ready}
             className="mt-4 w-full rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
           >
-            {working ? <span className="inline-flex items-center gap-2"><Spinner /> Reading the agreement and your accounts with an open model...</span> : "Analyse"}
+            {working ? <span className="inline-flex items-center gap-2"><Spinner /> Analysing with an open model...</span> : "Analyse"}
           </button>
+          {working && <Steps hasBudget={!!budget} />}
           <div className="mt-3"><ErrorNote message={uploadError} /></div>
         </Card>
         <p className="text-xs text-muted">
@@ -137,6 +138,51 @@ export default function Upload({ onLoad, loading, error }: {
           </Card>
         )}
       </div>
+    </div>
+  );
+}
+
+// The API returns one response with no progress events, so steps advance on a timer
+// and hold on the last one until the response arrives (the component then unmounts).
+const STEP_MS = 6000;
+
+function Steps({ hasBudget }: { hasBudget: boolean }) {
+  const steps = [
+    "Locating the covenant section",
+    "Extracting covenant terms",
+    hasBudget ? "Mapping accounts and budget lines" : "Mapping account lines",
+    "Building quarters",
+    "Running the covenant engine",
+  ];
+  const [step, setStep] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setStep((s) => Math.min(s + 1, steps.length - 1)), STEP_MS);
+    return () => clearInterval(t);
+  }, [steps.length]);
+  return (
+    <div className="mt-4" aria-live="polite">
+      <div className="flex gap-1">
+        {steps.map((_, i) => (
+          <div key={i} className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
+            <div
+              className={`h-full rounded-full bg-navy transition-[width] ease-linear ${i === step ? "animate-pulse" : ""}`}
+              style={{ width: i < step ? "100%" : i === step ? "60%" : "0%", transitionDuration: i === step ? `${STEP_MS}ms` : "300ms" }}
+            />
+          </div>
+        ))}
+      </div>
+      <ol className="mt-3 space-y-1.5 text-sm">
+        {steps.map((s, i) => (
+          <li key={s} className={`flex items-center gap-2 ${i < step ? "text-muted" : i === step ? "font-medium text-ink" : "text-faint"}`}>
+            <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
+              i < step ? "bg-navy text-white" : i === step ? "border-2 border-navy" : "border border-line"
+            }`}>
+              {i < step ? "✓" : ""}
+            </span>
+            {s}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

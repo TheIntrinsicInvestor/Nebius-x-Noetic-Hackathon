@@ -129,22 +129,23 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-3">
-          <div className="flex items-baseline gap-3">
-            <span className="text-lg font-bold tracking-tight text-accent">NorthStar</span>
-            <span className="hidden text-sm text-muted md:inline">See the covenant breach before your bank does.</span>
+      <header className="bg-navy text-paper">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 pb-3 pt-4">
+          <div className="flex items-baseline gap-4">
+            <span className="font-serif text-[28px] font-bold leading-none tracking-tight text-white">NorthStar</span>
+            <span className="hidden font-serif text-[17px] text-paper/80 md:inline">See the covenant breach before your bank does.</span>
           </div>
           {caseData && (
             <div className="min-w-0 text-right">
-              <div className="truncate text-sm font-semibold">{caseData.meta.display_name}</div>
-              <div className="truncate text-xs text-muted max-w-[560px]">{caseData.meta.description}</div>
-              <div className="truncate text-[11px] text-faint max-w-[560px]">
+              <div className="truncate font-serif text-base font-semibold text-white">{caseData.meta.display_name}</div>
+              <div className="truncate text-xs text-paper/75 max-w-[560px]">{caseData.meta.description}</div>
+              <div className="truncate text-[11px] text-paper/55 max-w-[560px]">
                 {[caseData.meta.sector, caseData.meta.country, caseData.meta.lender, caseData.meta.base_rate].filter(Boolean).join(" · ")}
               </div>
             </div>
           )}
         </div>
+        <div className="mx-auto max-w-[1400px] px-6"><div className="border-t border-dashed border-paper/35" /></div>
         <nav className="mx-auto flex max-w-[1400px] gap-1 px-6">
           {TABS.map((t, i) => {
             const disabled = needsCase(t.id);
@@ -156,10 +157,10 @@ export default function Home() {
                 disabled={disabled}
                 title={disabled ? "Load a company first" : undefined}
                 className={`flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition ${
-                  active ? "border-accent font-semibold text-ink" : "border-transparent text-muted hover:text-ink"
+                  active ? "border-white font-semibold text-white" : "border-transparent text-paper/70 hover:text-white"
                 } disabled:cursor-not-allowed disabled:opacity-40`}
               >
-                <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${active ? "bg-accent text-white" : "bg-canvas text-muted"}`}>
+                <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${active ? "bg-white text-navy" : "bg-white/10 text-paper/80"}`}>
                   {i + 1}
                 </span>
                 {t.label}

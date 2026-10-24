@@ -1,14 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #f4f6f7;
+  --canvas: #ececec;
   --surface: #ffffff;
-  --ink: #12212b;
-  --muted: #5a6a74;
-  --faint: #8a979f;
-  --line: #dde3e7;
-  --accent: #0d5c63;
-  --accent-soft: #e5f0f1;
+  --ink: #0e2742;
+  --muted: #4f5d6e;
+  --faint: #8792a0;
+  --line: #d9dce1;
+  --accent: #0e2742;
+  --accent-soft: #e6eaf0;
+  --navy: #0e2742;
+  --paper: #d9d9d9;
   --breach: #b42318;
   --breach-soft: #fdeceb;
   --warn: #b54708;
@@ -32,7 +34,10 @@
   --color-warn-soft: var(--warn-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
+  --color-navy: var(--navy);
+  --color-paper: var(--paper);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-garamond), "Bookman Old Style", Georgia, serif;
 }
 
 html,
@@ -61,7 +66,7 @@ input[type="range"] {
 }
 
 .skeleton {
-  background: #e7ecef;
+  background: #e3e6ea;
   border-radius: 4px;
   animation: shimmer 1.4s ease-in-out infinite;
 }

@@ -14,7 +14,7 @@ import { covValue, headroomTone, isMoneyKind, isUndefinedRatio, kindLabel, pct, 
 import type { CovenantPoint } from "@/lib/types";
 import { Pill } from "./ui";
 
-const ACCENT = "#0d5c63";
+const ACCENT = "#0e2742";
 const LIMIT = "#5a6a74";
 const BREACH = "#b42318";
 

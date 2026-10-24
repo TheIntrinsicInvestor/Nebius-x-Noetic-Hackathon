@@ -3,8 +3,12 @@
   {
    "kind": "leverage",
    "comparator": "max",
-   "threshold": 3.0,
+   "threshold": 3.25,
    "step_downs": [
+    {
+     "date": "2025-03-31",
+     "threshold": 3.0
+    },
     {
      "date": "2027-03-31",
      "threshold": 2.5
@@ -18,7 +22,7 @@
     "exceptional restructuring costs"
    ],
    "addback_cap_pct": 0.1,
-   "source_quote": "Leverage in respect of any Relevant Period shall not exceed 3.00:1 for each Relevant Period ending on or before 31 December 2026 and 2.50:1 thereafter."
+   "source_quote": "Leverage in respect of any Relevant Period shall not exceed 3.25:1 for each Relevant Period ending on or before 31 December 2024, 3.00:1 for each Relevant Period ending on or before 31 December 2026 and 2.50:1 thereafter."
   },
   {
    "kind": "interest_cover",

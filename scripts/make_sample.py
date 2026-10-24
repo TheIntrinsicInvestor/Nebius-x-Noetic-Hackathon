@@ -53,11 +53,13 @@ def build() -> list[Quarter]:
 
 COVENANTS = CovenantSet(
     covenants=[
-        Covenant(kind="leverage", comparator="max", threshold=3.0,
-                 step_downs=[StepDown(date=date(2027, 3, 31), threshold=2.5)],
+        Covenant(kind="leverage", comparator="max", threshold=3.25,
+                 step_downs=[StepDown(date=date(2025, 3, 31), threshold=3.0),
+                             StepDown(date=date(2027, 3, 31), threshold=2.5)],
                  addbacks=["exceptional restructuring costs"], addback_cap_pct=0.10,
-                 source_quote="Leverage in respect of any Relevant Period shall not exceed 3.00:1 for each Relevant "
-                              "Period ending on or before 31 December 2026 and 2.50:1 thereafter."),
+                 source_quote="Leverage in respect of any Relevant Period shall not exceed 3.25:1 for each Relevant "
+                              "Period ending on or before 31 December 2024, 3.00:1 for each Relevant Period ending "
+                              "on or before 31 December 2026 and 2.50:1 thereafter."),
         Covenant(kind="interest_cover", comparator="min", threshold=3.0,
                  source_quote="Interest Cover in respect of any Relevant Period shall not be less than 3.00:1."),
     ],
@@ -84,8 +86,9 @@ cash and cash equivalent investments held by the Group.
 
 21. FINANCIAL COVENANTS
 21.1 Financial condition. The Company shall ensure that:
-(a) Leverage: Leverage in respect of any Relevant Period shall not exceed 3.00:1 for each Relevant Period ending
-on or before 31 December 2026 and 2.50:1 thereafter.
+(a) Leverage: Leverage in respect of any Relevant Period shall not exceed 3.25:1 for each Relevant Period ending
+on or before 31 December 2024, 3.00:1 for each Relevant Period ending on or before 31 December 2026 and 2.50:1
+thereafter.
 (b) Interest Cover: Interest Cover in respect of any Relevant Period shall not be less than 3.00:1.
 21.2 Financial testing. The financial covenants shall be tested by reference to each of the financial statements
 and each Compliance Certificate delivered quarterly.

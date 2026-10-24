@@ -61,6 +61,7 @@ export default function Backtest() {
                     </td>
                     <td className="py-2">
                       <Outcome v={r.actual_in_compliance} />
+                      {r.note && <div className="text-xs text-muted">{r.note}</div>}
                     </td>
                     <td className="py-2 pr-2 text-right text-xs text-accent">{r.quote ? (isOpen ? "Hide filing" : "Filing quote") : ""}</td>
                   </tr>

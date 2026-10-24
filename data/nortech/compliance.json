@@ -1,6 +1,6 @@
 [
   {"period_end": "2024-12-31", "in_compliance": false, "quote": "On March 27, 2025, we amended (the “First Amendment”) the Revolver to waive our non-compliance with the leverage ratio and minimum fixed charge ratio as of December 31, 2024, and March 31, 2025.", "source": "10-Q Q3 2025"},
   {"period_end": "2025-03-31", "in_compliance": false, "quote": "On March 27, 2025, we amended (the “First Amendment”) the Revolver to waive our non-compliance with the leverage ratio and minimum fixed charge ratio as of December 31, 2024, and March 31, 2025.", "source": "10-Q Q3 2025"},
-  {"period_end": "2025-09-30", "in_compliance": true, "quote": "We were in compliance with financial covenants related to adjusted EBITDA for the third quarter of 2025.", "source": "10-Q Q3 2025", "note": "leverage and fixed charge tests were suspended until 31 Dec 2025 by the amendments"},
+  {"period_end": "2025-09-30", "in_compliance": true, "quote": "We were in compliance with financial covenants related to adjusted EBITDA for the third quarter of 2025.", "source": "10-Q Q3 2025", "note": "Only the EBITDA test applied: the bank had suspended the leverage and fixed charge tests until 31 Dec 2025"},
   {"period_end": "2025-12-31", "in_compliance": false, "quote": "Bank of America waived certain financial covenant defaults related to the Company’s Consolidated Leverage Ratio, Fixed Charge Coverage Ratio, and Consolidated EBITDA for the quarter ended December 31, 2025.", "source": "10-K 2025"}
 ]

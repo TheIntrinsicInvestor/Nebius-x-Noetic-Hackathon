@@ -14,6 +14,14 @@ def load():
     return qs, cs
 
 
+def test_sample_has_no_historical_breach():
+    qs, cs = load()
+    hist = [p for p in analyze(qs, cs).points if not p.is_forecast]
+    assert hist and not any(p.breached for p in hist)
+    lev = next(c for c in cs.covenants if c.kind == "leverage")
+    assert "2.50:1" in lev.source_quote and "3.25:1" in lev.source_quote
+
+
 def test_sample_breaches_only_under_dso_shock():
     qs, cs = load()
     assert len(qs) == 12

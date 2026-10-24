@@ -77,6 +77,13 @@ def test_ask_endpoint_logs_and_returns_answer(monkeypatch):
     assert client.post("/ask", json={"case": "nope", "question": "x"}).status_code == 404
 
 
+def test_backtest_row_explains_suspended_tests():
+    rows = client.get("/backtest/nortech").json()["rows"]
+    row = next(r for r in rows if r["as_of"] == "2025-09-30")
+    assert row["actual_in_compliance"] is True
+    assert "suspended" in row["note"]
+
+
 def test_agreement_rejects_pdf():
     r = client.post("/agreement", files={"file": ("a.pdf", b"%PDF", "application/pdf")})
     assert r.status_code == 415

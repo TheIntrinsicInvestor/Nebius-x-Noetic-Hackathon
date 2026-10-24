@@ -137,6 +137,7 @@ def backtest_rows() -> list[dict]:
             "predicted_first_breach": a.first_breach,
             "actual_in_compliance": t["in_compliance"] if t else None,
             "quote": t["quote"] if t else None,
+            "note": t.get("note") if t else None,
         })
     return rows
 

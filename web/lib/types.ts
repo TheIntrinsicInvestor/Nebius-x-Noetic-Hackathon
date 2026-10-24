@@ -170,6 +170,7 @@ export interface BacktestRow {
   predicted_first_breach: CovenantPoint | null;
   actual_in_compliance: boolean | null;
   quote: string | null;
+  note: string | null;
 }
 
 export interface BenchmarkRow {

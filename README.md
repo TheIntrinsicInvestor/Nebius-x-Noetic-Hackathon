@@ -1,6 +1,6 @@
 # NorthStar
 
-Covenant early warning for mid-sized companies that don't have a private equity owner.
+Covenant early warning for mid-sized companies ($10m to $500m of revenue).
 
 Built in one day at the Noetic x Nebius hackathon (Imperial College London, 24 October 2026) by Brian Liew and Matthan Coelho.
 
@@ -8,7 +8,7 @@ Built in one day at the Noetic x Nebius hackathon (Imperial College London, 24 O
 
 Most business loans come with covenants: ratios the company promises to stay within, tested every quarter. Break one and the bank can reprice the loan, charge a waiver fee or call it in.
 
-Large companies have treasury teams watching these numbers. Companies owned by private equity have the fund's finance people. A family-owned manufacturer with $50m to $500m of revenue usually has a finance director and a spreadsheet, and often finds out about a breach when the quarter's numbers are already in.
+Large corporates have treasury teams and expensive systems watching these numbers. Mid-sized firms, with $10m to $500m of revenue, carry the same complex debt but have small finance teams and no budget for those systems. They usually learn of a breach after the quarter closes, when it is too late to fix.
 
 ## What NorthStar does
 

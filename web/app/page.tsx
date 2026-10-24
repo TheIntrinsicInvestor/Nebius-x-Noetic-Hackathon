@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ChatDemo, ExtractDemo, TimelineRule, WhatIfDemo } from "@/components/landing/Demos";
+import { FilmBadge, FilmLink, FilmModal } from "@/components/landing/Film";
 import { Enter, Reveal } from "@/components/landing/Reveal";
 
 // Landing page for finance directors. Every figure here comes from the README / engine output.
@@ -68,8 +69,9 @@ export default function Landing() {
                   Upload your loan agreement and management accounts, or use a built-in sample. NorthStar forecasts every covenant test six quarters ahead.
                 </p>
               </Enter>
-              <Enter delay={0.24} className="mt-7">
+              <Enter delay={0.24} className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-4">
                 <Cta />
+                <FilmLink />
               </Enter>
             </div>
           </div>
@@ -81,6 +83,7 @@ export default function Landing() {
               priority
               alt="NorthStar dashboard for a sample UK packaging company: leverage is 2.75x against a 3.25x limit today, with a projected breach in Q4 2026 when the limit steps down to 2.50x."
             />
+            <FilmBadge />
           </Enter>
         </div>
       </section>
@@ -88,26 +91,50 @@ export default function Landing() {
       {/* The problem */}
       <section className="mx-auto max-w-[1280px] px-4 pb-24 pt-40 sm:pt-48 lg:pt-64 sm:px-6">
         <Reveal>
-          <p className="max-w-[26ch] font-serif text-[32px] leading-[1.15] sm:text-[40px]">
-            Covenants are tested every quarter. Many finance directors only find out where they stand once the numbers are in.
+          <p className="max-w-[28ch] font-serif text-[32px] leading-[1.15] sm:text-[40px]">
+            Covenants are tested every quarter. Mid-sized companies learn of a breach after the quarter closes, when it&apos;s too late to fix.
           </p>
           <p className="mt-6 max-w-[62ch] text-[17px] leading-relaxed text-muted">
-            Break a covenant and the bank can reprice the loan, charge a waiver fee or call it in. Who sees it coming depends on who is watching.
+            Break a covenant and the bank can reprice the loan, charge a waiver fee or call it in. Large corporates pay for treasury teams and systems to see it coming. Mid-sized firms carry the same complex debt without either.
           </p>
         </Reveal>
-        <div className="mt-14 grid gap-8 border-t border-line pt-8 md:grid-cols-3 md:gap-10">
-          {[
-            { who: "Large companies", watch: "A treasury team" },
-            { who: "Private equity owned", watch: "The fund's finance people" },
-            { who: "Family owned, $50m to $500m revenue", watch: "A finance director and a spreadsheet", you: true },
-          ].map((c, i) => (
-            <Reveal key={c.who} delay={i * 0.08}>
-              <div className={c.you ? "border-l-[3px] border-teal pl-4" : "border-l-[3px] border-transparent pl-4"}>
-                <div className="text-sm text-muted">{c.who}</div>
-                <div className={`mt-1 font-serif text-2xl ${c.you ? "font-semibold" : ""}`}>{c.watch}</div>
-              </div>
-            </Reveal>
-          ))}
+
+        {/* The gap: firm size on one axis, the mid-sized segment boxed (mirrors the launch film) */}
+        <div className="mt-16 border-t border-line pt-10">
+          <Reveal>
+            <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">Mid-sized companies fall through the gap.</h2>
+            <div aria-hidden className="mt-10 hidden items-center gap-4 text-sm font-medium tracking-wide text-muted md:flex">
+              <span className="h-px flex-1 bg-faint" />
+              Rising firm size
+              <span className="flex flex-1 items-center">
+                <span className="h-px flex-1 bg-faint" />
+                <svg viewBox="0 0 10 12" className="h-3 w-2.5 text-faint"><path d="M0 0 L10 6 L0 12z" fill="currentColor" /></svg>
+              </span>
+            </div>
+          </Reveal>
+          <div className="relative mt-8 grid gap-6 md:mt-10 md:grid-cols-3 md:gap-8">
+            <div aria-hidden className="absolute left-[16.67%] right-[16.67%] top-[7px] hidden h-px bg-line md:block" />
+            {[
+              { name: "Start-ups", body: "Simple debt" },
+              { name: "Mid-sized firms", band: "$10m to $500m revenue", points: ["Complex debt", "Small finance teams", "No budget for treasury systems"], you: true },
+              { name: "Large corporates", body: "Treasury teams and expensive systems" },
+            ].map((c, i) => (
+              <Reveal key={c.name} delay={0.1 + i * 0.1} className="relative md:text-center">
+                <span aria-hidden className={`absolute left-0 top-0.5 h-[15px] w-[15px] rounded-full border-[3px] border-canvas md:left-1/2 md:top-0 md:-translate-x-1/2 ${c.you ? "bg-breach" : "bg-faint"}`} />
+                {/* the plain columns get the box's padding + border so all three names line up */}
+                <div className={`ml-8 md:ml-0 md:mt-7 ${c.you ? "rounded-lg border-2 border-dashed border-breach/50 bg-surface p-5" : "md:pt-[22px]"}`}>
+                  <div className={`font-serif text-2xl sm:text-[28px] ${c.you ? "font-semibold" : ""}`}>{c.name}</div>
+                  {c.band && <div className="mt-1 text-sm font-semibold text-teal num">{c.band}</div>}
+                  {c.body && <p className="mt-2 text-muted">{c.body}</p>}
+                  {c.points && (
+                    <ul className="mt-3 space-y-1 text-[15px]">
+                      {c.points.map((pt) => <li key={pt}>{pt}</li>)}
+                    </ul>
+                  )}
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -261,6 +288,7 @@ export default function Landing() {
           <span className="max-w-[70ch]">NorthStar uses reported EBITDA, so it flags the trend rather than your bank&apos;s exact calculation.</span>
         </div>
       </footer>
+      <FilmModal />
     </div>
   );
 }

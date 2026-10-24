@@ -137,16 +137,6 @@ export default function Upload({ onLoad, loading, error }: {
             Upload your loan agreement and management accounts. NorthStar reads the covenants, maps your accounts, projects
             the next six quarters and shows how close each covenant is to breaking.
           </p>
-          <div className="text-right">
-            <button
-              onClick={autofill}
-              disabled={busy || loading !== null}
-              className="rounded-md border border-navy px-4 py-2 text-sm font-semibold text-navy hover:bg-navy hover:text-white disabled:opacity-50"
-            >
-              {filling ? <span className="inline-flex items-center gap-2"><Spinner /> Filling in...</span> : "Autofill with sample data"}
-            </button>
-            <div className="mt-1 text-xs text-muted">Ashby &amp; Rowe Engineering, a made-up UK firm</div>
-          </div>
         </div>
         <Card title="1. Company">
           <div className="grid grid-cols-2 gap-3">
@@ -188,6 +178,16 @@ export default function Upload({ onLoad, loading, error }: {
           {working && <Steps hasBudget={!!budget} stepMs={playing ? PLAY_MS / 5 : undefined} />}
           <div className="mt-3"><ErrorNote message={uploadError} /></div>
         </Card>
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={autofill}
+            disabled={busy || loading !== null}
+            className="rounded-md border border-navy px-4 py-2 text-sm font-semibold text-navy hover:bg-navy hover:text-white disabled:opacity-50"
+          >
+            {filling ? <span className="inline-flex items-center gap-2"><Spinner /> Filling in...</span> : "Autofill with sample data"}
+          </button>
+          <span className="text-xs text-muted">Ashby &amp; Rowe Engineering, a made-up UK firm</span>
+        </div>
         <ErrorNote message={error} />
       </div>
 

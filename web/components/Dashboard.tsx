@@ -1,10 +1,9 @@
 "use client";
 
 import { covValue, dateLabel, kindShort, money, pct, quarterLabel, isZeroScenario } from "@/lib/format";
-import type { Analysis, CaseData, CovenantSet, Insight, Scenario } from "@/lib/types";
+import type { Analysis, CaseData, CovenantSet, Scenario } from "@/lib/types";
 import Ask from "./Ask";
 import HeadroomChart, { ChartLegend } from "./HeadroomChart";
-import Insights from "./Insights";
 import Market from "./Market";
 import WhatIf from "./WhatIf";
 import { Card, ErrorNote, Spinner } from "./ui";
@@ -18,10 +17,6 @@ export interface DashboardProps {
   onScenario: (s: Scenario) => void;
   busy: boolean;
   error: string | null;
-  insights: Insight[] | null;
-  insightsLoading: boolean;
-  insightsError: string | null;
-  onRefreshInsights: () => void;
 }
 
 export default function Dashboard(p: DashboardProps) {
@@ -65,14 +60,13 @@ export default function Dashboard(p: DashboardProps) {
             </div>
           )}
         </div>
+        <Market caseName={caseData.meta.name} rewound={!!caseData.meta.as_of} />
         </div>
         <div className="col-span-12 lg:col-span-4 space-y-4">
           <WhatIf scenario={p.scenario} onChange={p.onScenario} base={p.base} live={live} busy={p.busy} currency={cur} />
           <Refi a={live} currency={cur} />
-          <Market caseName={caseData.meta.name} rewound={!!caseData.meta.as_of} />
         </div>
       </div>
-      <Insights insights={p.insights} loading={p.insightsLoading} error={p.insightsError} onRefresh={p.onRefreshInsights} />
       <Ask key={caseData.meta.name} caseName={caseData.meta.name} currency={cur} covenants={covenants} />
     </div>
   );

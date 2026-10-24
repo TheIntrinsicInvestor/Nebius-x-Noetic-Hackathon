@@ -1,13 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Dashboard from "@/components/Dashboard";
-import Outbound from "@/components/Outbound";
 import Review from "@/components/Review";
 import Upload from "@/components/Upload";
 import { analyze, errorMessage, getCase } from "@/lib/api";
 import { isZeroScenario } from "@/lib/format";
-import type { Analysis, CaseData, CaseName, CovenantSet, Insight, Scenario } from "@/lib/types";
+import type { Analysis, CaseData, CaseName, CovenantSet, Scenario } from "@/lib/types";
 import { ZERO_SCENARIO } from "@/lib/types";
 
 type Tab = "upload" | "review" | "dashboard";
@@ -34,23 +33,8 @@ export default function Home() {
   const [busy, setBusy] = useState(false);
   const [analysisError, setAnalysisError] = useState<string | null>(null);
 
-  const [insights, setInsights] = useState<Insight[] | null>(null);
-  const [insightsLoading, setInsightsLoading] = useState(false);
-  const [insightsError, setInsightsError] = useState<string | null>(null);
-
   const baseReq = useRef(0);
   const liveReq = useRef(0);
-  const insightReq = useRef(0);
-
-  const runInsights = useCallback((name: CaseName, cs: CovenantSet | null) => {
-    const id = ++insightReq.current;
-    setInsightsLoading(true);
-    setInsightsError(null);
-    analyze({ case: name, covenants: cs, scenario: ZERO_SCENARIO, insights: true })
-      .then((r) => { if (id === insightReq.current) setInsights(r.insights); })
-      .catch((e) => { if (id === insightReq.current) setInsightsError(errorMessage(e)); })
-      .finally(() => { if (id === insightReq.current) setInsightsLoading(false); });
-  }, []);
 
   async function loadCase(name: CaseName, uploaded?: CovenantSet) {
     setLoadingCase(name);
@@ -64,9 +48,7 @@ export default function Home() {
       setScenario(ZERO_SCENARIO);
       setBase(null);
       setLive(null);
-      setInsights(null);
       setAnalysisError(null);
-      runInsights(name, uploaded ?? null);
       setTab("review");
     } catch (e) {
       setCaseError(errorMessage(e));
@@ -127,10 +109,10 @@ export default function Home() {
     <div className="flex min-h-screen flex-col">
       <header className="bg-navy text-paper">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 pb-3 pt-4">
-          <div className="flex items-baseline gap-4">
-            <span className="font-serif text-[28px] font-bold leading-none tracking-tight text-white">NorthStar</span>
-            <span className="hidden font-serif text-[17px] text-paper/80 md:inline">See the covenant breach before your bank does.</span>
-          </div>
+          <span className="font-serif text-[28px] font-bold leading-none tracking-tight text-white">NorthStar</span>
+          {!caseData && (
+            <span className="hidden font-serif text-[15px] text-paper md:inline">See the covenant breach before your bank does.</span>
+          )}
           {caseData && (
             <div className="min-w-0 text-right">
               <div className="truncate font-serif text-base font-semibold text-white">{caseData.meta.display_name}</div>
@@ -189,15 +171,9 @@ export default function Home() {
             onScenario={setScenario}
             busy={busy}
             error={analysisError}
-            insights={insights}
-            insightsLoading={insightsLoading}
-            insightsError={insightsError}
-            onRefreshInsights={() => caseName && runInsights(caseName, override ? covenants : null)}
           />
         )}
       </main>
-
-      <Outbound />
     </div>
   );
 }

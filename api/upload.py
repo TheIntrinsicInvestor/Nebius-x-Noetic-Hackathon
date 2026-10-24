@@ -9,6 +9,7 @@ from openpyxl import load_workbook
 
 from api.extract_financials import MappedLine
 from api.models import BudgetQuarter, CovenantSet, Quarter
+from api.pdf import parse_number, pdf_rows
 
 FLOWS = ("revenue", "cogs", "opex", "da", "interest", "capex", "principal", "addbacks")
 BALANCES = ("cash", "debt", "receivables", "inventory", "payables")
@@ -32,20 +33,34 @@ def _month_end(v) -> date:
     return date(y, m, calendar.monthrange(y, m)[1])
 
 
-def read_sheet(data: bytes) -> tuple[list[date], list[tuple[str, list[float]]]]:
+def _parse_rows(rows: list) -> tuple[list[date], list[tuple[str, list[float]]]]:
     """First column = line names, header row = month or quarter ends."""
-    ws = load_workbook(io.BytesIO(data), read_only=True, data_only=True).active
-    rows = list(ws.iter_rows(values_only=True))
     if len(rows) < 2:
-        raise ValueError("the spreadsheet needs a header row of dates and at least one account line")
+        raise ValueError("the accounts need a header row of dates and at least one account line")
     cols = [_month_end(v) for v in rows[0][1:] if v not in (None, "")]
     lines = []
     for r in rows[1:]:
         if not r or r[0] in (None, ""):
             continue
-        vals = [float(v or 0) for v in r[1:1 + len(cols)]]
-        lines.append((str(r[0]).strip(), vals))
+        name = str(r[0]).strip()
+        try:
+            vals = [parse_number(v) for v in r[1:1 + len(cols)]]
+        except ValueError as e:
+            raise ValueError(f"account line '{name}': {e}") from None
+        lines.append((name, vals))
     return cols, lines
+
+
+def read_sheet(data: bytes) -> tuple[list[date], list[tuple[str, list[float]]]]:
+    ws = load_workbook(io.BytesIO(data), read_only=True, data_only=True).active
+    return _parse_rows(list(ws.iter_rows(values_only=True)))
+
+
+def read_table(data: bytes, filename: str) -> tuple[list[date], list[tuple[str, list[float]]]]:
+    """Accounts or budget from .xlsx or a text PDF, in the same shape."""
+    if filename.lower().endswith(".pdf"):
+        return _parse_rows(pdf_rows(data))
+    return read_sheet(data)
 
 
 def _quarter_totals(cols: list[date], lines: list[tuple[str, list[float]]], mapping: list[MappedLine],

@@ -21,7 +21,8 @@ from api.market import market_context
 from api.models import CovenantSet, Quarter, Scenario
 from api.extract_financials import map_lines
 from api.llm import PRIMARY_MODEL, SECOND_MODEL
-from api.upload import build_budget, build_quarters, read_sheet, save_case, slug
+from api.pdf import pdf_text
+from api.upload import build_budget, build_quarters, read_table, save_case, slug
 
 ROOT = Path(__file__).resolve().parent.parent
 BOFA_LAST_TEST = "2025-12-31"
@@ -139,15 +140,28 @@ def post_analyze(req: AnalyzeRequest):
     return {"analysis": a, "insights": insights, "cached": cached}
 
 
+AGREEMENT_TYPES = (".pdf", ".txt", ".htm", ".html")
+TABLE_TYPES = (".xlsx", ".pdf")
+
+
+def agreement_text(filename: str, data: bytes) -> str:
+    """Plain text of an agreement upload; raises ValueError for a scanned PDF."""
+    name = filename.lower()
+    if name.endswith(".pdf"):
+        return pdf_text(data)
+    raw = data.decode("utf-8", errors="replace")
+    return html_to_text(raw) if name.endswith((".htm", ".html")) else raw
+
+
 @app.post("/agreement")
 async def post_agreement(file: UploadFile):
     name = (file.filename or "").lower()
-    if not name.endswith((".txt", ".htm", ".html")):
-        raise HTTPException(415, "upload a .txt or .htm credit agreement")
-    raw = (await file.read()).decode("utf-8", errors="replace")
-    text = html_to_text(raw) if name.endswith((".htm", ".html")) else raw
-    log_outbound(MODEL_SERVICE, f"covenant extraction from {file.filename}")
+    if not name.endswith(AGREEMENT_TYPES):
+        raise HTTPException(415, "upload the credit agreement as .pdf, .htm or .txt")
+    data = await file.read()
     try:
+        text = agreement_text(name, data)
+        log_outbound(MODEL_SERVICE, f"covenant extraction from {file.filename}")
         cs, stats = with_fallback(extract_covenants, text)
     except ValueError as e:
         raise HTTPException(422, str(e))
@@ -161,22 +175,24 @@ async def post_company(agreement: UploadFile, financials: UploadFile, budget: Up
                        unit: str = Form("thousands")):
     """Upload a credit agreement and management accounts; both are read by the open model and saved as a case."""
     a_name, f_name = (agreement.filename or "").lower(), (financials.filename or "").lower()
-    if not a_name.endswith((".txt", ".htm", ".html")):
-        raise HTTPException(415, "upload the credit agreement as .htm or .txt")
-    if not f_name.endswith(".xlsx"):
-        raise HTTPException(415, "upload the management accounts as .xlsx")
-    if budget and not (budget.filename or "").lower().endswith(".xlsx"):
-        raise HTTPException(415, "upload the budget as .xlsx")
-    raw = (await agreement.read()).decode("utf-8", errors="replace")
-    text = html_to_text(raw) if a_name.endswith((".htm", ".html")) else raw
+    if not a_name.endswith(AGREEMENT_TYPES):
+        raise HTTPException(415, "upload the credit agreement as .pdf, .htm or .txt")
+    if not f_name.endswith(TABLE_TYPES):
+        raise HTTPException(415, "upload the management accounts as .xlsx or .pdf")
+    b_name = (budget.filename or "").lower() if budget else ""
+    if budget and not b_name.endswith(TABLE_TYPES):
+        raise HTTPException(415, "upload the budget as .xlsx or .pdf")
+    a_data = await agreement.read()
     data = await financials.read()
-    log_outbound(MODEL_SERVICE, f"covenant extraction from {agreement.filename}")
     b_data = await budget.read() if budget else None
-    files = financials.filename + (f" and {budget.filename}" if budget else "")
-    log_outbound(MODEL_SERVICE, f"account line names from {files} (names only, no amounts)")
     try:
-        cols, lines = read_sheet(data)
-        b_cols, b_lines = read_sheet(b_data) if b_data else ([], [])
+        # read every file before any outbound call, so a scanned or malformed upload costs nothing
+        text = agreement_text(a_name, a_data)
+        cols, lines = read_table(data, f_name)
+        b_cols, b_lines = read_table(b_data, b_name) if b_data else ([], [])
+        log_outbound(MODEL_SERVICE, f"covenant extraction from {agreement.filename}")
+        files = financials.filename + (f" and {budget.filename}" if budget else "")
+        log_outbound(MODEL_SERVICE, f"account line names from {files} (names only, no amounts)")
         names = list(dict.fromkeys(n for n, _ in lines + b_lines))  # one mapping call covers both files
         cs, a_stats = with_fallback(extract_covenants, text)
         mapping, f_stats = with_fallback(map_lines, names)

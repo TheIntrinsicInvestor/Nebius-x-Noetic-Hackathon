@@ -182,40 +182,6 @@ export interface CompanyResponse {
   stats: { agreement: ExtractionStats; financials: ExtractionStats };
 }
 
-export interface BacktestRow {
-  as_of: string;
-  current: CovenantPoint[];
-  predicted_first_breach: CovenantPoint | null;
-  actual_in_compliance: boolean | null;
-  quote: string | null;
-  note: string | null;
-}
-
-export interface BenchmarkRow {
-  model: string;
-  open: boolean;
-  docs: number;
-  kind_recall: number;
-  threshold_acc: number;
-  stepdown_acc: number;
-  invented_covenants?: number;
-  cost_per_doc_usd: number;
-  latency_s: number | null;
-}
-
-export interface BenchmarkError {
-  doc: string;
-  field: string;
-  expected: string;
-  got: string;
-}
-
-export interface BenchmarkResponse {
-  rows: BenchmarkRow[];
-  errors: Record<string, BenchmarkError[]>;
-  notes?: string[];
-}
-
 export interface OutboundCall {
   time: string;
   service: string;

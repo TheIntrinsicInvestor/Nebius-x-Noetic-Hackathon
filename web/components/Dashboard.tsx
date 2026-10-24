@@ -3,7 +3,6 @@
 import { covValue, dateLabel, kindShort, money, pct, quarterLabel, isZeroScenario } from "@/lib/format";
 import type { Analysis, CaseData, CovenantSet, Insight, Scenario } from "@/lib/types";
 import Ask from "./Ask";
-import Backtest from "./Backtest";
 import HeadroomChart, { ChartLegend } from "./HeadroomChart";
 import Insights from "./Insights";
 import Market from "./Market";
@@ -28,7 +27,6 @@ export interface DashboardProps {
 export default function Dashboard(p: DashboardProps) {
   const { caseData, covenants, live } = p;
   const cur = caseData.meta.currency;
-  const isNortech = caseData.meta.name === "nortech";
 
   if (!live) {
     return (
@@ -44,7 +42,7 @@ export default function Dashboard(p: DashboardProps) {
   return (
     <div className="space-y-5">
       <ErrorNote message={p.error} />
-      <Banner caseData={caseData} a={live} scenarioOn={!isZeroScenario(p.scenario)} showBacktestLink={isNortech} />
+      <Banner caseData={caseData} a={live} scenarioOn={!isZeroScenario(p.scenario)} />
       <div className="grid grid-cols-12 gap-5">
         <div className="col-span-12 lg:col-span-8 space-y-3">
         <div className="flex items-center justify-between">
@@ -76,16 +74,14 @@ export default function Dashboard(p: DashboardProps) {
       </div>
       <Insights insights={p.insights} loading={p.insightsLoading} error={p.insightsError} onRefresh={p.onRefreshInsights} />
       <Ask key={caseData.meta.name} caseName={caseData.meta.name} currency={cur} covenants={covenants} />
-      {isNortech && <div id="backtest" className="scroll-mt-4"><Backtest /></div>}
     </div>
   );
 }
 
-function Banner({ caseData, a, scenarioOn, showBacktestLink }: {
+function Banner({ caseData, a, scenarioOn }: {
   caseData: CaseData;
   a: Analysis;
   scenarioOn: boolean;
-  showBacktestLink: boolean;
 }) {
   const cur = caseData.meta.currency;
   const fb = a.first_breach;
@@ -126,9 +122,6 @@ function Banner({ caseData, a, scenarioOn, showBacktestLink }: {
                 </>
               ) : (
                 <>Forecast {kindShort(fb.kind).toLowerCase()} reaches {covValue(fb.kind, fb.value, cur)} against a {covValue(fb.kind, fb.threshold, cur)} limit.</>
-              )}
-              {showBacktestLink && (
-                <> <a href="#backtest" className="font-medium text-accent underline underline-offset-2">See what actually happened</a></>
               )}
             </p>
           )}

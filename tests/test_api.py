@@ -89,6 +89,12 @@ def test_backtest_row_explains_suspended_tests():
     assert "suspended" in row["note"]
 
 
-def test_agreement_rejects_pdf():
-    r = client.post("/agreement", files={"file": ("a.pdf", b"%PDF", "application/pdf")})
+def test_agreement_rejects_unsupported_types():
+    r = client.post("/agreement", files={"file": ("a.docx", b"PK", "application/octet-stream")})
     assert r.status_code == 415
+
+
+def test_agreement_with_a_broken_pdf_is_a_readable_422():
+    r = client.post("/agreement", files={"file": ("a.pdf", b"%PDF", "application/pdf")})
+    assert r.status_code == 422
+    assert "could not read this PDF" in r.json()["detail"]

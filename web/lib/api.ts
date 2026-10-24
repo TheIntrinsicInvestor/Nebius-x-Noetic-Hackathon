@@ -2,8 +2,6 @@ import type {
   AnalyzeRequest,
   AnalyzeResponse,
   AskResponse,
-  BacktestRow,
-  BenchmarkResponse,
   CaseData,
   CaseName,
   CompanyResponse,
@@ -53,15 +51,6 @@ export function analyze(body: AnalyzeRequest): Promise<AnalyzeResponse> {
 
 export function createCompany(form: FormData): Promise<CompanyResponse> {
   return request<CompanyResponse>("/company", { method: "POST", body: form });
-}
-
-export async function getBacktest(): Promise<BacktestRow[]> {
-  const r = await request<{ rows: BacktestRow[] }>("/backtest/nortech");
-  return r.rows;
-}
-
-export function getBenchmark(): Promise<BenchmarkResponse> {
-  return request<BenchmarkResponse>("/benchmark");
 }
 
 export function ask(caseName: string, question: string, covenants: CovenantSet): Promise<AskResponse> {

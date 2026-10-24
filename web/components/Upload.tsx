@@ -6,32 +6,21 @@ import { comparatorLabel, covValue, kindLabel, modelName, quarterLabel, seconds,
 import type { CaseName, CompanyResponse } from "@/lib/types";
 import { Card, ErrorNote, Spinner } from "./ui";
 
-// Samples replay the upload flow: fields type in, file names drop in, the progress bar plays, then the cached case loads.
-type Sample = {
-  name: CaseName;
-  label: string;
-  fields: { name: string; sector: string; country: string; lender: string; currency: string; unit: string };
-  agreement: string;
-  financials: string;
-  budget?: string;
+// Autofill types in the Ashby & Rowe sample and attaches its real files (copied from demo_files/ into
+// public/samples/). Analysing it untouched replays the cached case (progress bar, then load); any edit
+// after autofilling makes Analyse a genuine upload instead.
+const SAMPLE = {
+  name: "sample_uk" as CaseName,
+  fields: { name: "Ashby & Rowe Engineering Ltd", sector: "Engineering manufacturing", country: "UK", lender: "UK high street banks", currency: "£", unit: "thousands" },
+  dir: "/samples/ashby_rowe/",
+  agreement: "facility_agreement.txt",
+  financials: "ashby_rowe_management_accounts.xlsx",
+  budget: "ashby_rowe_budget_fy27.xlsx",
 };
-
-const SAMPLES: Sample[] = [
-  {
-    name: "nortech", label: "US electronics manufacturer (public filings)",
-    fields: { name: "Nortech Systems Inc.", sector: "electronics manufacturing", country: "United States", lender: "Bank of America", currency: "$", unit: "thousands" },
-    agreement: "credit_agreement_2024-03.htm", financials: "nortech_quarterly_accounts.xlsx",
-  },
-  {
-    name: "sample_uk", label: "UK engineering firm",
-    fields: { name: "Ashby & Rowe Engineering Ltd", sector: "engineering manufacturing", country: "UK", lender: "UK high street banks", currency: "£", unit: "thousands" },
-    agreement: "facility_agreement.txt", financials: "ashby_rowe_management_accounts.xlsx", budget: "ashby_rowe_budget_fy27.xlsx",
-  },
-];
 
 const PLAY_MS = 8000;
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
-const placeholderFile = (n: string) => new File([], n);
+const sampleFile = async (n: string) => new File([await (await fetch(SAMPLE.dir + n)).blob()], n);
 
 const CATEGORY: Record<string, string> = {
   revenue: "Revenue", cogs: "Direct costs", opex: "Overheads", da: "Depreciation", interest: "Interest",
@@ -60,8 +49,12 @@ export default function Upload({ onLoad, loading, error }: {
   const [result, setResult] = useState<CompanyResponse | null>(null);
 
   const [playing, setPlaying] = useState(false);
-  const busy = working || playing;
+  const [filling, setFilling] = useState(false);
+  // true while the form still holds the untouched sample
+  const [isSample, setIsSample] = useState(false);
+  const busy = working || playing || filling;
   const ready = name.trim() && agreement && financials && !busy;
+  const edit = <T,>(set: (v: T) => void) => (v: T) => { setIsSample(false); set(v); };
 
   async function typeInto(set: (v: string) => void, text: string) {
     for (let i = 1; i <= text.length; i++) {
@@ -70,39 +63,50 @@ export default function Upload({ onLoad, loading, error }: {
     }
   }
 
-  async function playSample(s: Sample) {
+  async function autofill() {
     if (busy) return;
-    setPlaying(true);
+    setFilling(true);
     setResult(null);
     setUploadError(null);
-    [setName, setSector, setCountry, setLender].forEach((f) => f(""));
-    setAgreement(null);
-    setFinancials(null);
-    setBudget(null);
-    setCurrency(s.fields.currency);
-    setUnit(s.fields.unit);
-    await typeInto(setName, s.fields.name);
-    await typeInto(setSector, s.fields.sector);
-    await typeInto(setCountry, s.fields.country);
-    await typeInto(setLender, s.fields.lender);
-    await wait(300);
-    setAgreement(placeholderFile(s.agreement));
-    await wait(350);
-    setFinancials(placeholderFile(s.financials));
-    if (s.budget) {
+    try {
+      const files = Promise.all([sampleFile(SAMPLE.agreement), sampleFile(SAMPLE.financials), sampleFile(SAMPLE.budget)]);
+      [setName, setSector, setCountry, setLender].forEach((f) => f(""));
+      setAgreement(null);
+      setFinancials(null);
+      setBudget(null);
+      setCurrency(SAMPLE.fields.currency);
+      setUnit(SAMPLE.fields.unit);
+      await typeInto(setName, SAMPLE.fields.name);
+      await typeInto(setSector, SAMPLE.fields.sector);
+      await typeInto(setCountry, SAMPLE.fields.country);
+      await typeInto(setLender, SAMPLE.fields.lender);
+      const [a, f, b] = await files;
+      await wait(300);
+      setAgreement(a);
       await wait(350);
-      setBudget(placeholderFile(s.budget));
+      setFinancials(f);
+      await wait(350);
+      setBudget(b);
+      setIsSample(true);
+    } catch (e) {
+      setUploadError(`Could not load the sample files: ${errorMessage(e)}`);
+    } finally {
+      setFilling(false);
     }
-    await wait(900);
+  }
+
+  async function replaySample() {
+    setPlaying(true);
     setWorking(true);
     await wait(PLAY_MS);
     setWorking(false);
     setPlaying(false);
-    onLoad(s.name);
+    onLoad(SAMPLE.name);
   }
 
   async function analyse() {
     if (!ready) return;
+    if (isSample) return replaySample();
     const form = new FormData();
     form.append("name", name.trim());
     form.append("sector", sector);
@@ -128,25 +132,37 @@ export default function Upload({ onLoad, loading, error }: {
   return (
     <div className="grid grid-cols-12 gap-5">
       <div className="col-span-12 lg:col-span-7 space-y-4">
-        <p className="text-sm text-muted max-w-xl">
-          Upload your loan agreement and management accounts. NorthStar reads the covenants, maps your accounts, projects
-          the next six quarters and shows how close each covenant is to breaking.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-muted max-w-xl">
+            Upload your loan agreement and management accounts. NorthStar reads the covenants, maps your accounts, projects
+            the next six quarters and shows how close each covenant is to breaking.
+          </p>
+          <div className="text-right">
+            <button
+              onClick={autofill}
+              disabled={busy || loading !== null}
+              className="rounded-md border border-navy px-4 py-2 text-sm font-semibold text-navy hover:bg-navy hover:text-white disabled:opacity-50"
+            >
+              {filling ? <span className="inline-flex items-center gap-2"><Spinner /> Filling in...</span> : "Autofill with sample data"}
+            </button>
+            <div className="mt-1 text-xs text-muted">Ashby &amp; Rowe Engineering, a made-up UK firm</div>
+          </div>
+        </div>
         <Card title="1. Company">
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Company name"><input className={input} value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Ashby & Rowe Engineering" /></Field>
-            <Field label="Sector"><input className={input} value={sector} onChange={(e) => setSector(e.target.value)} placeholder="e.g. engineering manufacturing" /></Field>
-            <Field label="Country"><input className={input} value={country} onChange={(e) => setCountry(e.target.value)} placeholder="e.g. UK" /></Field>
-            <Field label="Lender"><input className={input} value={lender} onChange={(e) => setLender(e.target.value)} placeholder="e.g. HSBC" /></Field>
+            <Field label="Company name"><input className={input} value={name} onChange={(e) => edit(setName)(e.target.value)} placeholder="e.g. Ashby & Rowe Engineering" /></Field>
+            <Field label="Sector"><input className={input} value={sector} onChange={(e) => edit(setSector)(e.target.value)} placeholder="e.g. Engineering manufacturing" /></Field>
+            <Field label="Country"><input className={input} value={country} onChange={(e) => edit(setCountry)(e.target.value)} placeholder="e.g. UK" /></Field>
+            <Field label="Lender"><input className={input} value={lender} onChange={(e) => edit(setLender)(e.target.value)} placeholder="e.g. HSBC" /></Field>
             <Field label="Currency">
-              <select className={input} value={currency} onChange={(e) => setCurrency(e.target.value)}>
+              <select className={input} value={currency} onChange={(e) => edit(setCurrency)(e.target.value)}>
                 <option value="$">US dollar ($)</option>
                 <option value="£">Pound sterling (£)</option>
                 <option value="€">Euro (€)</option>
               </select>
             </Field>
             <Field label="Amounts in the accounts">
-              <select className={input} value={unit} onChange={(e) => setUnit(e.target.value)}>
+              <select className={input} value={unit} onChange={(e) => edit(setUnit)(e.target.value)}>
                 <option value="thousands">Thousands</option>
                 <option value="millions">Millions</option>
                 <option value="units">Units</option>
@@ -156,11 +172,11 @@ export default function Upload({ onLoad, loading, error }: {
         </Card>
         <Card title="2. Documents">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Drop label="Loan or facility agreement" hint=".htm or .txt" accept=".htm,.html,.txt" file={agreement} onFile={setAgreement} />
-            <Drop label="Management accounts" hint=".xlsx, accounts down the side, months or quarters across" accept=".xlsx" file={financials} onFile={setFinancials} />
+            <Drop label="Loan or facility agreement" hint=".pdf, .htm or .txt" accept=".pdf,.htm,.html,.txt" file={agreement} onFile={edit(setAgreement)} />
+            <Drop label="Management accounts" hint=".xlsx or .pdf, accounts down the side, months or quarters across" accept=".xlsx,.pdf" file={financials} onFile={edit(setFinancials)} />
           </div>
           <div className="mt-3">
-            <Drop label="Budget or internal forecast (optional)" hint=".xlsx, same layout; adds planned spend and events. Without it NorthStar projects the trend" accept=".xlsx" file={budget} onFile={setBudget} />
+            <Drop label="Budget or internal forecast (optional)" hint=".xlsx or .pdf, same layout; adds planned spend and events. Without it NorthStar projects the trend" accept=".xlsx,.pdf" file={budget} onFile={edit(setBudget)} />
           </div>
           <button
             onClick={analyse}
@@ -172,17 +188,6 @@ export default function Upload({ onLoad, loading, error }: {
           {working && <Steps hasBudget={!!budget} stepMs={playing ? PLAY_MS / 5 : undefined} />}
           <div className="mt-3"><ErrorNote message={uploadError} /></div>
         </Card>
-        <p className="text-xs text-muted">
-          No files to hand? Try a sample company:{" "}
-          {SAMPLES.map((s, i) => (
-            <span key={s.name}>
-              {i > 0 && " · "}
-              <button onClick={() => playSample(s)} disabled={busy || loading !== null} className="font-medium text-teal underline underline-offset-2 disabled:opacity-50">
-                {s.label}
-              </button>
-            </span>
-          ))}
-        </p>
         <ErrorNote message={error} />
       </div>
 

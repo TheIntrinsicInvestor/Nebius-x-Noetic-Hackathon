@@ -99,7 +99,7 @@ export default function Ask({ caseName, currency, covenants }: { caseName: strin
         aria-hidden={!open}
         className={`fixed right-0 top-0 z-50 flex h-full w-[420px] max-w-full flex-col border-l border-line bg-surface shadow-2xl transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
       >
-        <header className="border-t-[3px] border-teal bg-navy px-5 py-4 text-paper">
+        <header className="bg-navy px-5 py-4 text-paper">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="font-serif text-xl font-semibold text-white">Ask NorthStar</h2>

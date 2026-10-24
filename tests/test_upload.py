@@ -103,3 +103,34 @@ def test_primary_model_error_falls_back_to_second_model(monkeypatch):
         return x, model
 
     assert with_fallback(flaky, 1) == (1, SECOND_MODEL)
+
+
+def test_budget_keeps_only_quarters_after_actuals():
+    from api.upload import build_budget
+
+    data = _xlsx(["Account", "Sep-26", "Dec-26", "Mar-27"],
+                 [["Sales", 1000, 1100, 1200], ["COGS", 600, 600, 600], ["Overheads", 100, 100, 100],
+                  ["New press line", 0, 0, 2000]])
+    cols, lines = read_sheet(data)
+    m = [_m("Sales", "revenue"), _m("COGS", "cogs"), _m("Overheads", "opex"), _m("New press line", "capex")]
+    b = build_budget(cols, lines, m, "thousands", after=date(2026, 9, 30))
+    assert [q.period_end for q in b] == [date(2026, 12, 31), date(2027, 3, 31)]
+    assert b[0].ebitda == pytest.approx(0.4)
+    assert b[1].capex == pytest.approx(2.0)
+    with pytest.raises(ValueError, match="no complete quarter after"):
+        build_budget(cols, lines, m, "thousands", after=date(2027, 3, 31))
+
+
+def test_forecast_uses_budget_then_trend():
+    from api.cases import load_case
+    from api.engine.forecast import project
+    from api.models import BudgetQuarter
+
+    qs, _, _ = load_case("sample_uk")
+    trend = project(qs, 6)
+    plan = [BudgetQuarter(period_end=trend[0].period_end, revenue=20.0, cogs=12.0, ebitda=3.0, da=0.5, capex=4.0)]
+    fc = project(qs, 6, budget=plan)
+    assert fc[0].revenue == pytest.approx(20.0)
+    assert fc[0].ebitda == pytest.approx(3.0)
+    assert fc[0].capex == pytest.approx(4.0)
+    assert fc[1].revenue == pytest.approx(trend[1].revenue)  # after the budget: trend again

@@ -132,6 +132,7 @@ export interface Analysis {
   reverse_stress: { ebitda_fall_pct: number; dso_days: number };
   refi: Refi;
   forecast: Quarter[];
+  budget_until: string | null;
 }
 
 export interface Insight {
@@ -176,6 +177,8 @@ export interface CompanyResponse {
   covenants: CovenantSet;
   mapping: MappedLine[];
   quarters: number;
+  budget_quarters: number;
+  budget_until: string | null;
   stats: { agreement: ExtractionStats; financials: ExtractionStats };
 }
 

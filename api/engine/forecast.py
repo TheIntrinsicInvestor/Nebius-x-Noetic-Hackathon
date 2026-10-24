@@ -1,7 +1,7 @@
 import calendar
 from datetime import date
 
-from api.models import Quarter, Scenario
+from api.models import BudgetQuarter, Quarter, Scenario
 
 DAYS = 91.25  # days per quarter for receivable/inventory/supplier days
 
@@ -21,8 +21,10 @@ def _days(num: float, den: float) -> float:
     return num / den * DAYS if den else 0.0
 
 
-def project(history: list[Quarter], n: int = 6, sc: Scenario = Scenario()) -> list[Quarter]:
-    """Driver-based quarterly projection from the company's own trailing history."""
+def project(history: list[Quarter], n: int = 6, sc: Scenario = Scenario(),
+            budget: list[BudgetQuarter] | None = None) -> list[Quarter]:
+    """Driver-based quarterly projection from the company's own trailing history. Quarters covered by the
+    finance team's budget take its P&L and capex; working capital, cash and debt are derived the same way."""
     if len(history) < 4:
         raise ValueError("need >= 4 quarters")
     last4 = history[-4:]
@@ -44,28 +46,37 @@ def project(history: list[Quarter], n: int = 6, sc: Scenario = Scenario()) -> li
     debt4 = sum(q.debt for q in last4)
     rate = (sum(q.interest_expense for q in last4) / debt4 if debt4 else 0.0) + sc.rate_bp / 1e4 / 4
 
+    plan = {b.period_end: b for b in budget or []}
     base_rev = [q.revenue for q in history]  # revenue path before the scenario shock
     prev = history[-1]
     out: list[Quarter] = []
     for k in range(n):
-        base_rev.append(base_rev[-4] * (1 + g))
+        end = next_quarter_end(prev.period_end)
+        b = plan.get(end)
+        base_rev.append(b.revenue if b else base_rev[-4] * (1 + g))
         revenue = base_rev[-1] * (1 + sc.revenue_pct)
-        ebitda = margin * revenue
-        cogs = cogs_ratio * revenue
-        q_capex = capex + (sc.capex_extra / 4 if k < 4 else 0.0)
+        if b:
+            ebitda = b.ebitda * (1 + sc.revenue_pct) * (1 + sc.ebitda_pct)
+            cogs = b.cogs * (1 + sc.revenue_pct)
+            q_da, q_principal, q_capex = b.da, b.principal_paid, b.capex
+        else:
+            ebitda = margin * revenue
+            cogs = cogs_ratio * revenue
+            q_da, q_principal, q_capex = da, principal, capex
+        q_capex += sc.capex_extra / 4 if k < 4 else 0.0
         receivables = dso * revenue / DAYS
         inventory = dio * cogs / DAYS
         payables = dpo * cogs / DAYS
         interest = rate * prev.debt
         d_nwc = (receivables + inventory - payables) - (prev.receivables + prev.inventory - prev.payables)
-        debt = prev.debt - principal
-        cash = prev.cash + ebitda - interest - q_capex - d_nwc - principal
+        debt = prev.debt - q_principal
+        cash = prev.cash + ebitda - interest - q_capex - d_nwc - q_principal
         if cash < 0:  # draw on the revolver
             debt += -cash
             cash = 0.0
-        q = Quarter(period_end=next_quarter_end(prev.period_end), revenue=revenue, cogs=cogs,
-                    ebit=ebitda - da, da=da, interest_expense=interest, capex=q_capex,
-                    principal_paid=principal, addbacks=0, cash=cash, debt=debt,
+        q = Quarter(period_end=end, revenue=revenue, cogs=cogs,
+                    ebit=ebitda - q_da, da=q_da, interest_expense=interest, capex=q_capex,
+                    principal_paid=q_principal, addbacks=0, cash=cash, debt=debt,
                     receivables=receivables, inventory=inventory, payables=payables)
         out.append(q)
         prev = q

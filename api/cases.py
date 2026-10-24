@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from api.models import CovenantSet, Quarter
+from api.models import BudgetQuarter, CovenantSet, Quarter
 
 DATA = Path(__file__).resolve().parent.parent / "data"
 UPLOADS = DATA / "uploads"
@@ -34,3 +34,11 @@ def load_case(name: str, full: bool = False) -> tuple[list[Quarter], CovenantSet
     if as_of and not full:
         qs = [q for q in qs if q.period_end.isoformat() <= as_of]
     return qs, cs, meta
+
+
+def load_budget(name: str) -> list[BudgetQuarter] | None:
+    """The finance team's uploaded budget, if any (uploaded companies only)."""
+    p = UPLOADS / name / "budget.json"
+    if not name.startswith("u-") or not p.exists():
+        return None
+    return [BudgetQuarter(**b) for b in json.loads(p.read_text(encoding="utf-8"))]

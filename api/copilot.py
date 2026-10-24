@@ -2,7 +2,7 @@
 import json
 import time
 
-from api.cases import load_case
+from api.cases import load_budget, load_case
 from api.engine.headroom import analyze
 from api.explain import allowed_numbers, validate_numbers
 from api.llm import PRIMARY_MODEL, PRICES, _client
@@ -17,7 +17,7 @@ def run_scenario_tool(case: str, args: dict, covenants: CovenantSet | None = Non
     qs, cs, meta = load_case(case)
     cs = covenants or cs  # thresholds edited on Review or applied from an upload
     sc = Scenario(**{k: float(v) for k, v in args.items() if k in Scenario.model_fields})
-    a = analyze(qs, cs, sc)
+    a = analyze(qs, cs, sc, budget=load_budget(case))
     lows = {}
     for p in a.points:
         if p.is_forecast and (p.kind not in lows or p.headroom_pct < lows[p.kind]["headroom_pct"]):

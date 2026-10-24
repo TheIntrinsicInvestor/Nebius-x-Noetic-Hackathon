@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createCompany, errorMessage } from "@/lib/api";
-import { comparatorLabel, covValue, kindLabel, modelName, seconds, usd } from "@/lib/format";
+import { comparatorLabel, covValue, kindLabel, modelName, quarterLabel, seconds, usd } from "@/lib/format";
 import type { CaseName, CompanyResponse } from "@/lib/types";
 import { Card, ErrorNote, Spinner } from "./ui";
 
@@ -32,6 +32,7 @@ export default function Upload({ onLoad, loading, error }: {
   const [unit, setUnit] = useState("thousands");
   const [agreement, setAgreement] = useState<File | null>(null);
   const [financials, setFinancials] = useState<File | null>(null);
+  const [budget, setBudget] = useState<File | null>(null);
   const [working, setWorking] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [result, setResult] = useState<CompanyResponse | null>(null);
@@ -49,6 +50,7 @@ export default function Upload({ onLoad, loading, error }: {
     form.append("unit", unit);
     form.append("agreement", agreement);
     form.append("financials", financials);
+    if (budget) form.append("budget", budget);
     setWorking(true);
     setUploadError(null);
     setResult(null);
@@ -94,6 +96,9 @@ export default function Upload({ onLoad, loading, error }: {
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Drop label="Loan or facility agreement" hint=".htm or .txt" accept=".htm,.html,.txt" file={agreement} onFile={setAgreement} />
             <Drop label="Management accounts" hint=".xlsx, accounts down the side, months or quarters across" accept=".xlsx" file={financials} onFile={setFinancials} />
+          </div>
+          <div className="mt-3">
+            <Drop label="Budget or internal forecast (optional)" hint=".xlsx, same layout; adds planned spend and events. Without it NorthStar projects the trend" accept=".xlsx" file={budget} onFile={setBudget} />
           </div>
           <button
             onClick={analyse}
@@ -198,6 +203,11 @@ function Result({ result, currency, onContinue, loading }: {
           <div className="rounded-md bg-accent-soft px-3 py-2 text-accent num">
             {result.mapping.length} account lines mapped in {seconds(f.latency_s)} for {usd(f.cost_usd)}, {result.quarters} quarters built
           </div>
+          <p className="mt-2 text-xs text-muted">
+            {result.budget_until
+              ? `Forecast uses your budget for ${result.budget_quarters} quarter${result.budget_quarters === 1 ? "" : "s"} (to ${quarterLabel(result.budget_until)}), then the trend.`
+              : "No budget uploaded: the forecast projects the trend from your last 4 quarters."}
+          </p>
           <table className="mt-2 w-full text-xs">
             <tbody>
               {result.mapping.map((m) => (

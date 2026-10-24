@@ -109,6 +109,9 @@ function Banner({ caseData, a, scenarioOn, showBacktestLink }: {
               {caseData.meta.as_of ? `Today: ${dateLabel(today)} (rewound)` : `Latest accounts: ${dateLabel(today)}`}
             </span>
             {scenarioOn && <span className="rounded bg-surface px-1.5 py-0.5 font-medium text-accent">What-if scenario applied</span>}
+            <span className="rounded bg-surface px-1.5 py-0.5">
+              {a.budget_until ? `Forecast: your budget to ${quarterLabel(a.budget_until)}, trend after` : "Forecast: trend from your last 4 quarters"}
+            </span>
           </div>
           <h2 className={`mt-1 text-2xl font-semibold tracking-tight ${fb ? "text-breach" : "text-ok"}`}>
             {fb ? `Projected breach: ${kindShort(fb.kind)} in ${quarterLabel(fb.period_end)}` : `No breach projected in the next ${horizon} quarters`}

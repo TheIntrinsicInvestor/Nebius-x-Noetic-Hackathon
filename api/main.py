@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from api.cases import DATA, UPLOADS, load_case
+from api.cases import DATA, UPLOADS, load_budget, load_case
 from api.copilot import ask
 from api.engine.headroom import Analysis, analyze
 from api.explain import make_insights
@@ -21,7 +21,7 @@ from api.market import market_context
 from api.models import CovenantSet, Quarter, Scenario
 from api.extract_financials import map_lines
 from api.llm import PRIMARY_MODEL, SECOND_MODEL
-from api.upload import build_quarters, read_sheet, save_case, slug
+from api.upload import build_budget, build_quarters, read_sheet, save_case, slug
 
 ROOT = Path(__file__).resolve().parent.parent
 BOFA_LAST_TEST = "2025-12-31"
@@ -121,7 +121,7 @@ def post_analyze(req: AnalyzeRequest):
     qs = req.quarters if req.quarters is not None else qs
     cs = req.covenants or cs
     try:
-        a = analyze(qs, cs, req.scenario)
+        a = analyze(qs, cs, req.scenario, budget=load_budget(req.case))
     except ValueError as e:
         raise HTTPException(422, str(e))
     insights, cached = [], False
@@ -155,7 +155,8 @@ async def post_agreement(file: UploadFile):
 
 
 @app.post("/company")
-async def post_company(agreement: UploadFile, financials: UploadFile, name: str = Form(...), sector: str = Form(""),
+async def post_company(agreement: UploadFile, financials: UploadFile, budget: UploadFile | None = None,
+                       name: str = Form(...), sector: str = Form(""),
                        country: str = Form(""), lender: str = Form(""), currency: str = Form("$"),
                        unit: str = Form("thousands")):
     """Upload a credit agreement and management accounts; both are read by the open model and saved as a case."""
@@ -164,16 +165,23 @@ async def post_company(agreement: UploadFile, financials: UploadFile, name: str 
         raise HTTPException(415, "upload the credit agreement as .htm or .txt")
     if not f_name.endswith(".xlsx"):
         raise HTTPException(415, "upload the management accounts as .xlsx")
+    if budget and not (budget.filename or "").lower().endswith(".xlsx"):
+        raise HTTPException(415, "upload the budget as .xlsx")
     raw = (await agreement.read()).decode("utf-8", errors="replace")
     text = html_to_text(raw) if a_name.endswith((".htm", ".html")) else raw
     data = await financials.read()
     log_outbound(MODEL_SERVICE, f"covenant extraction from {agreement.filename}")
-    log_outbound(MODEL_SERVICE, f"account line names from {financials.filename} (names only, no amounts)")
+    b_data = await budget.read() if budget else None
+    files = financials.filename + (f" and {budget.filename}" if budget else "")
+    log_outbound(MODEL_SERVICE, f"account line names from {files} (names only, no amounts)")
     try:
         cols, lines = read_sheet(data)
+        b_cols, b_lines = read_sheet(b_data) if b_data else ([], [])
+        names = list(dict.fromkeys(n for n, _ in lines + b_lines))  # one mapping call covers both files
         cs, a_stats = with_fallback(extract_covenants, text)
-        mapping, f_stats = with_fallback(map_lines, [n for n, _ in lines])
+        mapping, f_stats = with_fallback(map_lines, names)
         qs = build_quarters(cols, lines, mapping, unit)
+        plan = build_budget(b_cols, b_lines, mapping, unit, qs[-1].period_end) if b_data else None
     except ValueError as e:
         raise HTTPException(422, str(e))
     case = slug(name)
@@ -181,10 +189,12 @@ async def post_company(agreement: UploadFile, financials: UploadFile, name: str 
             "country": country, "lender": lender, "base_rate": cs.facility.base_rate_name or "",
             "description": f"Uploaded {datetime.now():%d %b %Y}: {agreement.filename} and {financials.filename}, "
                            f"{len(qs)} quarters to {qs[-1].period_end:%b %Y}."}
-    save_case(UPLOADS, case, qs, cs, meta, mapping)
+    save_case(UPLOADS, case, qs, cs, meta, mapping, plan)
     for stale in (CACHE / f"{case}_insights.json", CACHE / f"market_{case}.json"):
         stale.unlink(missing_ok=True)
     return {"case": case, "covenants": cs, "mapping": mapping, "quarters": len(qs),
+            "budget_quarters": len(plan) if plan else 0,
+            "budget_until": plan[-1].period_end if plan else None,
             "stats": {"agreement": a_stats.__dict__, "financials": f_stats.__dict__}}
 
 

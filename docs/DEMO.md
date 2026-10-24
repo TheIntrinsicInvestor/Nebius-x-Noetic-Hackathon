@@ -38,6 +38,10 @@ Every number below was produced by the running code today (24 Oct 2026) or quote
 
 **6. Why open, and close (20 s).** Loan terms and unaudited numbers are the most sensitive data a company has. Open weights can run inside the company's own environment (Token Factory dedicated endpoints, or self-hosted), and they are cheap enough for firms that will never buy Kyriba. Web searches only carry public metadata; the outbound log proves it. Channel: accountants and fractional finance directors who already look after many of these firms.
 
+## Optional budget upload (mention in the pitch; not in the rehearsed demo)
+- Upload screen has a third, optional drop zone: "Budget or internal forecast". Same spreadsheet layout. Budgeted quarters use the finance team's revenue, costs, EBITDA, capex and loan repayments; the engine still derives working capital, cash and debt, so the sliders work on top. Quarters beyond the budget fall back to the trend. Without a budget, the forecast is the trend from the last 4 quarters.
+- Verified example: Ashby & Rowe trend view shows no breach (leverage peaks 2.52x). With `demo_files/ashby_rowe/ashby_rowe_budget_fy27.xlsx` (a planned £2m press line in Q1 2027) the dashboard shows "Projected breach: Leverage in Q1 2027" at 2.78x. Line: "the trend says you're fine; your own plan says you're not."
+
 ## Honest caveats (have answers ready)
 - Our EBITDA is GAAP from SEC filings; banks add back items, so our ratios can be harsher than the bank's. The backtest flags the trend, not the bank's exact number. Example if asked: our minimum-EBITDA test says breach at Q3 2025 (filing: complied) and pass at Q4 2025 (10-K: waived default). Add-backs and a non-LTM measurement period in the amendments explain it; leverage is the covenant we call correctly.
 - The what-if panel's sliders are customers-pay-later, EBITDA change, extra capex and rates. Revenue was removed from the UI because a one-quarter working-capital swing made it move breaches the "wrong" way on screen.

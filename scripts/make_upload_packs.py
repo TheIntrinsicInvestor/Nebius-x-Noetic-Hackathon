@@ -71,7 +71,39 @@ def ashby_rowe() -> None:
     wb.save(d / "ashby_rowe_management_accounts.xlsx")
 
 
+def ashby_rowe_budget() -> None:
+    """FY27 budget (Oct-26 to Sep-27): last year's quarters +3%, plus a planned £2m machinery spend in Q1 2027."""
+    qs, _, _ = load_case("sample_uk")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Budget FY27"
+    last_year = qs[-4:]
+    months = [date(q.period_end.year + 1, q.period_end.month - 2 + k, 1) for q in last_year for k in range(3)]
+    ws.append(["Account"] + [m.strftime("%b-%y") for m in months])
+    flows = [(n, c, s) for n, c, s in LINES if c not in BALANCES and c != "addbacks"]
+    for name, cat, share in flows + [("Term loan repayments", "principal", 1.0)]:
+        row = [name]
+        for q in last_year:
+            for k in range(3):
+                if cat == "opex":
+                    v = (q.revenue - q.cogs - q.ebitda) * share / 3 * 1.03
+                elif cat == "interest":
+                    v = q.interest_expense / 3
+                elif cat == "principal":
+                    v = q.principal_paid / 3
+                elif cat == "capex":
+                    v = q.capex / 3 + (2.0 / 3 if q.period_end.month == 3 else 0.0)  # new press line, Jan-Mar 27
+                elif cat == "da":
+                    v = q.da / 3
+                else:
+                    v = getattr(q, cat) * share / 3 * 1.03
+                row.append(round(v * 1000, 1))  # £k
+        ws.append(row)
+    wb.save(OUT / "ashby_rowe" / "ashby_rowe_budget_fy27.xlsx")
+
+
 if __name__ == "__main__":
     nortech()
     ashby_rowe()
+    ashby_rowe_budget()
     print(sorted(str(p.relative_to(OUT)) for p in OUT.rglob("*.*")))

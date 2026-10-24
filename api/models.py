@@ -59,6 +59,17 @@ class Quarter(BaseModel):
         return self.ebit + self.da + self.addbacks
 
 
+class BudgetQuarter(BaseModel):
+    """A finance team's own plan for one future quarter (P&L and capex only; the engine derives the balance sheet)."""
+    period_end: date
+    revenue: float
+    cogs: float
+    ebitda: float
+    da: float
+    capex: float
+    principal_paid: float = 0
+
+
 class Scenario(BaseModel):
     revenue_pct: float = 0
     ebitda_pct: float = 0

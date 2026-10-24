@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from api.engine.covenants import headroom_pct, metric_value, threshold_at
 from api.engine.forecast import project
 from api.engine.refi import refi_summary
-from api.models import CovenantSet, Quarter, Scenario
+from api.models import BudgetQuarter, CovenantSet, Quarter, Scenario
 
 
 OFF_CHART = 999.0  # shown value when a ratio is undefined (zero or negative EBITDA)
@@ -30,6 +30,7 @@ class Analysis(BaseModel):
     reverse_stress: dict[str, float]
     refi: dict
     forecast: list[Quarter]
+    budget_until: date | None = None  # last forecast quarter taken from the finance team's budget
 
 
 def _needs_input(cov) -> bool:
@@ -37,8 +38,8 @@ def _needs_input(cov) -> bool:
     return cov.threshold is None or cov.threshold <= 0
 
 
-def _points(history: list[Quarter], cs: CovenantSet, sc: Scenario, n: int):
-    forecast = project(history, n, sc)
+def _points(history: list[Quarter], cs: CovenantSet, sc: Scenario, n: int, budget=None):
+    forecast = project(history, n, sc, budget)
     series = history + forecast
     points: list[CovenantPoint] = []
     for cov in cs.covenants:
@@ -58,13 +59,13 @@ def _points(history: list[Quarter], cs: CovenantSet, sc: Scenario, n: int):
     return points, forecast
 
 
-def _breaches(history, cs, sc, n) -> bool:
-    points, _ = _points(history, cs, sc, n)
+def _breaches(history, cs, sc, n, budget=None) -> bool:
+    points, _ = _points(history, cs, sc, n, budget)
     return any(p.breached and p.is_forecast for p in points)
 
 
-def _reverse_stress(history, cs, sc, n) -> dict[str, float]:
-    if _breaches(history, cs, sc, n):
+def _reverse_stress(history, cs, sc, n, budget=None) -> dict[str, float]:
+    if _breaches(history, cs, sc, n, budget):
         return {"ebitda_fall_pct": 0, "dso_days": 0}
 
     def with_(**kw):
@@ -72,24 +73,24 @@ def _reverse_stress(history, cs, sc, n) -> dict[str, float]:
 
     # largest EBITDA fall with no forecast breach
     lo, hi = -0.9, sc.ebitda_pct
-    if not _breaches(history, cs, with_(ebitda_pct=lo), n):
+    if not _breaches(history, cs, with_(ebitda_pct=lo), n, budget):
         fall = lo
     else:
         while hi - lo > 0.005:
             mid = (lo + hi) / 2
-            if _breaches(history, cs, with_(ebitda_pct=mid), n):
+            if _breaches(history, cs, with_(ebitda_pct=mid), n, budget):
                 lo = mid
             else:
                 hi = mid
         fall = hi
     # largest receivable-days rise with no forecast breach
     lo, hi = sc.dso_delta, 180.0
-    if not _breaches(history, cs, with_(dso_delta=hi), n):
+    if not _breaches(history, cs, with_(dso_delta=hi), n, budget):
         days = hi
     else:
         while hi - lo > 0.5:
             mid = (lo + hi) / 2
-            if _breaches(history, cs, with_(dso_delta=mid), n):
+            if _breaches(history, cs, with_(dso_delta=mid), n, budget):
                 hi = mid
             else:
                 lo = mid
@@ -99,8 +100,8 @@ def _reverse_stress(history, cs, sc, n) -> dict[str, float]:
 
 
 def analyze(history: list[Quarter], cs: CovenantSet, sc: Scenario = Scenario(), n: int = 6,
-            as_of: date | None = None) -> Analysis:
-    points, forecast = _points(history, cs, sc, n)
+            as_of: date | None = None, budget: list[BudgetQuarter] | None = None) -> Analysis:
+    points, forecast = _points(history, cs, sc, n, budget)
     fc = [p for p in points if p.is_forecast]
     breached = sorted((p for p in fc if p.breached), key=lambda p: p.period_end)
     binding = min(fc, key=lambda p: p.headroom_pct).kind if fc else None
@@ -109,7 +110,8 @@ def analyze(history: list[Quarter], cs: CovenantSet, sc: Scenario = Scenario(), 
         first_breach=breached[0] if breached else None,
         binding_kind=binding,
         needs_input=[c.kind for c in cs.covenants if _needs_input(c)],
-        reverse_stress=_reverse_stress(history, cs, sc, n),
+        reverse_stress=_reverse_stress(history, cs, sc, n, budget),
         refi=refi_summary(cs.facility, as_of or history[-1].period_end, history[-1].debt),
         forecast=forecast,
+        budget_until=max((q.period_end for q in forecast if budget and q.period_end in {b.period_end for b in budget}), default=None),
     )

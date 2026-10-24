@@ -8,7 +8,7 @@ from datetime import date, datetime
 from openpyxl import load_workbook
 
 from api.extract_financials import MappedLine
-from api.models import CovenantSet, Quarter
+from api.models import BudgetQuarter, CovenantSet, Quarter
 
 FLOWS = ("revenue", "cogs", "opex", "da", "interest", "capex", "principal", "addbacks")
 BALANCES = ("cash", "debt", "receivables", "inventory", "payables")
@@ -48,9 +48,9 @@ def read_sheet(data: bytes) -> tuple[list[date], list[tuple[str, list[float]]]]:
     return cols, lines
 
 
-def build_quarters(cols: list[date], lines: list[tuple[str, list[float]]], mapping: list[MappedLine],
-                   unit: str = "thousands") -> list[Quarter]:
-    """Sum flow lines over each calendar quarter; take balance lines at the quarter end. Engine works in millions."""
+def _quarter_totals(cols: list[date], lines: list[tuple[str, list[float]]], mapping: list[MappedLine],
+                    unit: str) -> list[tuple[date, dict[str, float]]]:
+    """Sum flow lines over each complete calendar quarter; take balance lines at the quarter end. In millions."""
     if unit not in UNITS:
         raise ValueError(f"unit must be one of {list(UNITS)}")
     div = UNITS[unit]
@@ -61,7 +61,7 @@ def build_quarters(cols: list[date], lines: list[tuple[str, list[float]]], mappi
     for i, c in enumerate(cols):
         qm = ((c.month - 1) // 3 + 1) * 3
         groups.setdefault(date(c.year, qm, calendar.monthrange(c.year, qm)[1]), []).append(i)
-    qs = []
+    out = []
     for qend, idx in sorted(groups.items()):
         if len(idx) < per_q:
             continue  # incomplete quarter
@@ -72,7 +72,14 @@ def build_quarters(cols: list[date], lines: list[tuple[str, list[float]]], mappi
                 tot[k] += sum(vals[i] for i in idx)
             elif k in BALANCES:
                 tot[k] += vals[idx[-1]]
-        t = {k: v / div for k, v in tot.items()}
+        out.append((qend, {k: v / div for k, v in tot.items()}))
+    return out
+
+
+def build_quarters(cols: list[date], lines: list[tuple[str, list[float]]], mapping: list[MappedLine],
+                   unit: str = "thousands") -> list[Quarter]:
+    qs = []
+    for qend, t in _quarter_totals(cols, lines, mapping, unit):
         qs.append(Quarter(
             period_end=qend, revenue=t["revenue"], cogs=t["cogs"],
             ebit=t["revenue"] - t["cogs"] - t["opex"] - t["da"] - t["addbacks"], da=t["da"],
@@ -84,15 +91,33 @@ def build_quarters(cols: list[date], lines: list[tuple[str, list[float]]], mappi
     return qs
 
 
+def build_budget(cols: list[date], lines: list[tuple[str, list[float]]], mapping: list[MappedLine],
+                 unit: str, after: date) -> list[BudgetQuarter]:
+    """Budget quarters after the last actual quarter; balance-sheet lines in a budget are ignored."""
+    out = [BudgetQuarter(period_end=qend, revenue=t["revenue"], cogs=t["cogs"],
+                         ebitda=t["revenue"] - t["cogs"] - t["opex"], da=t["da"], capex=t["capex"],
+                         principal_paid=t["principal"])
+           for qend, t in _quarter_totals(cols, lines, mapping, unit) if qend > after]
+    if not out:
+        raise ValueError(f"the budget has no complete quarter after the latest accounts ({after:%b %Y})")
+    return out
+
+
 def slug(name: str) -> str:
     s = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
     return "u-" + (s or "company")[:40]
 
 
-def save_case(root, case: str, qs: list[Quarter], cs: CovenantSet, meta: dict, mapping: list[MappedLine]) -> None:
+def save_case(root, case: str, qs: list[Quarter], cs: CovenantSet, meta: dict, mapping: list[MappedLine],
+              budget: list[BudgetQuarter] | None = None) -> None:
     d = root / case
     d.mkdir(parents=True, exist_ok=True)
     (d / "quarters.json").write_text(json.dumps([q.model_dump(mode="json") for q in qs], indent=1), encoding="utf-8")
     (d / "covenants.json").write_text(cs.model_dump_json(indent=1), encoding="utf-8")
     (d / "meta.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
     (d / "mapping.json").write_text(json.dumps([m.model_dump() for m in mapping], indent=1), encoding="utf-8")
+    bpath = d / "budget.json"
+    if budget:
+        bpath.write_text(json.dumps([b.model_dump(mode="json") for b in budget], indent=1), encoding="utf-8")
+    else:
+        bpath.unlink(missing_ok=True)  # re-upload without a budget falls back to the trend

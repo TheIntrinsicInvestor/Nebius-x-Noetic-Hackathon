@@ -1,0 +1,56 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 2.5,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "asset impairment or restructuring costs (capped)",
+    "non-cash stock-based compensation"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Leverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower to be greater than 2.50 to 1.00."
+  },
+  {
+   "kind": "fixed_charge_cover",
+   "comparator": "min",
+   "threshold": 1.25,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "asset impairment or restructuring costs (capped)",
+    "non-cash stock-based compensation"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Fixed Charge Coverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower to be less than 1.25 to 1.00."
+  }
+ ],
+ "facility": {
+  "size": 15000000,
+  "maturity": "2027-02-28",
+  "margin_pct": 0.75,
+  "base_rate_name": "Base Rate",
+  "source_quote": "\u201cApplicable Rate\u201d means, for any day, the rate per annum for (a) Revolving Loans that are Base Rate Loans shall be 0.75%, (b) Revolving Loans that are Term SOFR Loans shall be 1.75%"
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 3805,
+  "completion_tokens": 384,
+  "latency_s": 2.069624299998395,
+  "cost_usd": 0.0008011499999999999
+ }
+}

@@ -1,0 +1,70 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 5.5,
+   "step_downs": [
+    {
+     "date": "2028-10-01",
+     "threshold": 5.0
+    },
+    {
+     "date": "2029-04-01",
+     "threshold": 4.5
+    },
+    {
+     "date": "2029-09-30",
+     "threshold": 4.25
+    }
+   ],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Maximum Consolidated Leverage Ratio On or prior to July 2, 2028 2.25 to 1.00 5.50 to 1.00"
+  },
+  {
+   "kind": "interest_cover",
+   "comparator": "min",
+   "threshold": 2.25,
+   "step_downs": [
+    {
+     "date": "2028-10-01",
+     "threshold": 2.5
+    },
+    {
+     "date": "2029-04-01",
+     "threshold": 2.75
+    },
+    {
+     "date": "2029-09-30",
+     "threshold": 3.0
+    }
+   ],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Minimum Consolidated Interest Coverage Ratio Maximum Consolidated Leverage Ratio On or prior to July 2, 2028 2.25 to 1.00 5.50 to 1.00"
+  }
+ ],
+ "facility": {
+  "size": 3400000000,
+  "maturity": null,
+  "margin_pct": 2.5,
+  "base_rate_name": "Term SOFR",
+  "source_quote": "Pursuant to the Credit Agreement, the Lenders provided the Company with (i) $1.15 billion senior secured term loan A facility (the \u201cTerm Loan A\u201d), (ii) a $100.0 million senior secured delayed draw term loan A facility (the \u201cDDTL Term Loan A\u201d; together with the Term Loan A, the \u201cTerm Loan A Facilities\u201d), (iii) a $1.45 billion senior secured term loan B facility (the \u201cTerm Loan B\u201d) and (iv) a $700.0 million revolving credit facility (the \u201cRevolving Credit Facility\u201d and with the Term Loan A, the DDTL Term Loan A and the Term Loan B, the \u201cFinancing\u201d). During the Covenant Relief Period, the initial applicable rate for the Term Loan A Facilities and the Revolving Credit Facility from the Amendment effective date until the first business day after the compliance certificate for the fiscal quarter ending September 28, 2026 is received by the Administrative Agent will be 1.50% per annum for base rate loans and 2.50% per annum for Term SOFR rate loans"
+ },
+ "_stats": {
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "prompt_tokens": 2232,
+  "completion_tokens": 7536,
+  "latency_s": 13.451266700052656,
+  "cost_usd": 0.009712799999999999
+ }
+}

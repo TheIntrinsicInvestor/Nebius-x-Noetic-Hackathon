@@ -10,6 +10,7 @@ DEF_NAMES = ("Consolidated EBITDA|Consolidated Leverage Ratio|Total Leverage Rat
              "Consolidated Net Debt|Maturity Date|Applicable Rate|Revolving Commitment|Measurement Period")
 DEF_RE = re.compile(r'(?i)[“"](' + DEF_NAMES + r')[”"]\s+(?:means|shall mean)')
 ANY_DEF_RE = re.compile(r'[“"][A-Z][^”"]{1,80}[”"]\s+(?:means|shall mean|has the meaning)')
+PROSE_RE = re.compile(r"(?i)(leverage ratio|coverage ratio|minimum (?:consolidated )?ebitda)")
 COVENANT_CHARS = 8000
 DEF_CHARS = 4000
 
@@ -29,16 +30,20 @@ def html_to_text(html: str) -> str:
 
 def locate_sections(text: str) -> list[Chunk]:
     chunks: list[Chunk] = []
-    # last "Financial Covenants" hit is usually the operative section, not the table of contents
-    hits = [m for m in COVENANT_RE.finditer(text)]
-    if hits:
-        def score(m: re.Match) -> int:
-            window = text[m.start(): m.start() + COVENANT_CHARS]
-            operative = len(re.findall(r"(?i)\bpermit\b|shall not (?:permit|be)", window))
-            blanks = window.count("$___")  # compliance-certificate forms are full of blanks
-            return operative * 3 + len(re.findall(r"(?i)to\s+1\.00|:1\.0", window)) - blanks
-        best = max(hits, key=score)
-        chunks.append(Chunk("covenants", text[best.start(): best.start() + COVENANT_CHARS]))
+    # candidates: covenant headings, and ratio mentions (prose 8-Ks have no heading; small caps break headings)
+    starts = {m.start() for m in COVENANT_RE.finditer(text)}
+    starts |= {max(0, m.start() - 1500) for m in PROSE_RE.finditer(text)}
+
+    def score(s: int) -> int:
+        window = text[s: s + COVENANT_CHARS]
+        operative = len(re.findall(r"(?i)\bpermit\b|shall not (?:permit|exceed|be)|may not (?:exceed|be)", window))
+        levels = len(re.findall(r"(?i)\d\.\d{1,2}\s*(?:to|:)\s*1(?:\.0{1,2})?\b", window))
+        blanks = window.count("$___")  # compliance-certificate forms are full of blanks
+        return operative * 3 + levels * 4 - blanks
+
+    if starts:
+        best = max(sorted(starts), key=score)
+        chunks.append(Chunk("covenants", text[best: best + COVENANT_CHARS]))
     seen = set()
     for m in DEF_RE.finditer(text):
         name = m.group(1)

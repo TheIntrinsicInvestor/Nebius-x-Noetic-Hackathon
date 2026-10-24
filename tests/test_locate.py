@@ -26,6 +26,14 @@ def test_locates_definition_until_next():
     assert "Consolidated Leverage Ratio" in chunks
 
 
+def test_prose_fallback_finds_ratio_sentence():
+    text = ("Item 1.01. On June 25 the Company amended its credit agreement. " * 3 +
+            "The amendment provides that the total leverage ratio may not exceed 4.25 to 1.0 for the quarter.")
+    chunks = locate_sections(text)
+    assert chunks[0].title == "covenants"
+    assert "4.25 to 1.0" in chunks[0].text
+
+
 def test_no_match_returns_empty():
     assert locate_sections("A lease agreement about a warehouse.") == []
 

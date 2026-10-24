@@ -1,0 +1,163 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.75,
+   "step_downs": [
+    {
+     "date": "2025-12-31",
+     "threshold": 6.0
+    },
+    {
+     "date": "2026-03-31",
+     "threshold": 6.0
+    },
+    {
+     "date": "2026-06-30",
+     "threshold": 6.0
+    },
+    {
+     "date": "2026-09-30",
+     "threshold": 6.0
+    },
+    {
+     "date": "2026-12-31",
+     "threshold": 6.75
+    },
+    {
+     "date": "2027-03-31",
+     "threshold": 6.75
+    },
+    {
+     "date": "2027-06-30",
+     "threshold": 6.75
+    },
+    {
+     "date": "2027-09-30",
+     "threshold": 6.75
+    },
+    {
+     "date": "2027-12-31",
+     "threshold": 6.75
+    },
+    {
+     "date": "2028-03-31",
+     "threshold": 6.0
+    },
+    {
+     "date": "2028-06-30",
+     "threshold": 5.5
+    },
+    {
+     "date": "2028-09-30",
+     "threshold": 5.25
+    },
+    {
+     "date": "2028-12-31",
+     "threshold": 4.5
+    }
+   ],
+   "effective_from": "2025-12-31",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "during the Covenant Relief Period, the U.S. Borrower shall maintain as of the last day of each Fiscal Quarter a Leverage Ratio of not more than the applicable level set forth below"
+  },
+  {
+   "kind": "interest_cover",
+   "comparator": "min",
+   "threshold": 3.5,
+   "step_downs": [
+    {
+     "date": "2025-12-31",
+     "threshold": 2.0
+    },
+    {
+     "date": "2026-03-31",
+     "threshold": 2.0
+    },
+    {
+     "date": "2026-06-30",
+     "threshold": 2.0
+    },
+    {
+     "date": "2026-09-30",
+     "threshold": 2.0
+    },
+    {
+     "date": "2026-12-31",
+     "threshold": 2.0
+    },
+    {
+     "date": "2027-03-31",
+     "threshold": 2.0
+    },
+    {
+     "date": "2027-06-30",
+     "threshold": 2.0
+    },
+    {
+     "date": "2027-09-30",
+     "threshold": 2.25
+    },
+    {
+     "date": "2027-12-31",
+     "threshold": 2.25
+    },
+    {
+     "date": "2028-03-31",
+     "threshold": 2.5
+    },
+    {
+     "date": "2028-06-30",
+     "threshold": 2.5
+    },
+    {
+     "date": "2028-09-30",
+     "threshold": 2.5
+    },
+    {
+     "date": "2028-12-31",
+     "threshold": 2.5
+    }
+   ],
+   "effective_from": "2025-12-31",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "during the Covenant Relief Period, the U.S. Borrower shall maintain an Interest Coverage Ratio, as determined as of the last day of each Fiscal Quarter, for the four consecutive Fiscal Quarters ending on such day, of not less than the applicable level"
+  },
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.5,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "The U.S. Borrower shall maintain as of the last day of each Fiscal Quarter a Secured Leverage Ratio of not more than 3.50 to 1.00."
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": null,
+  "source_quote": ""
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 3133,
+  "completion_tokens": 767,
+  "latency_s": 4.455885000061244,
+  "cost_usd": 0.00093015
+ }
+}

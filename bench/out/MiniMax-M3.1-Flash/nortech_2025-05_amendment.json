@@ -1,0 +1,66 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 2.5,
+   "step_downs": [],
+   "effective_from": "2025-12-31",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Permit the Consolidated Leverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower, beginning with the fiscal quarter ending December 31, 2025, to be greater than 2.50."
+  },
+  {
+   "kind": "fixed_charge_cover",
+   "comparator": "min",
+   "threshold": 1.25,
+   "step_downs": [],
+   "effective_from": "2025-12-31",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Permit the Consolidated Fixed Charge Coverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower, beginning with the fiscal quarter ending December 31, 2025, to be less than 1.25 to 1.00."
+  },
+  {
+   "kind": "min_ebitda",
+   "comparator": "min",
+   "threshold": 1000000,
+   "step_downs": [
+    {
+     "date": "2025-09-30",
+     "threshold": 1300000
+    },
+    {
+     "date": "2025-12-31",
+     "threshold": 1600000
+    }
+   ],
+   "effective_from": "2025-06-30",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Permit Consolidated EBITDA as of the end of the Measurement Periods set forth below to be less than the amount set forth below for such date: Fiscal Quarter Ending Minimum Consolidated EBITDA June 30, 2025 $ 1,000,000 September 30, 2025 $ 1,300,000 December 31, 2025 and thereafter $ 1,600,000"
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": "2026-06-30",
+  "margin_pct": 2.0,
+  "base_rate_name": "Base Rate",
+  "source_quote": "\u201cMaturity Date\u201d means with respect to the Revolving Facility, June 30, 2026; provided , that , if such date is not a Business Day, the Maturity Date shall be the next preceding Business Day."
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 3735,
+  "completion_tokens": 531,
+  "latency_s": 3.83628679998219,
+  "cost_usd": 0.0008788499999999999
+ }
+}

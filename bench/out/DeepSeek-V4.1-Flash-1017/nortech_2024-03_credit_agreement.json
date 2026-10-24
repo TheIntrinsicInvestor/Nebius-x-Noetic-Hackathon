@@ -1,0 +1,58 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 2.5,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "non-cash items reducing Consolidated Net Income",
+    "asset impairment or restructuring costs",
+    "non-cash stock-based compensation"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Leverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower to be greater than 2.50 to 1.00."
+  },
+  {
+   "kind": "fixed_charge_cover",
+   "comparator": "min",
+   "threshold": 1.25,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "non-cash items reducing Consolidated Net Income",
+    "asset impairment or restructuring costs",
+    "non-cash stock-based compensation"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Fixed Charge Coverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower to be less than 1.25 to 1.00."
+  }
+ ],
+ "facility": {
+  "size": 15000000,
+  "maturity": "2027-02-28",
+  "margin_pct": 1.75,
+  "base_rate_name": "Term SOFR",
+  "source_quote": "The Revolving Commitment on the Closing Date shall be $15,000,000."
+ },
+ "_stats": {
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "prompt_tokens": 3805,
+  "completion_tokens": 2904,
+  "latency_s": 5.974463400081731,
+  "cost_usd": 0.004626299999999999
+ }
+}

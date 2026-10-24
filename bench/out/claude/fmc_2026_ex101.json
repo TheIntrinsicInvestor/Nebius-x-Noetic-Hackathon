@@ -1,0 +1,61 @@
+{
+  "covenants": [
+    {
+      "kind": "leverage",
+      "comparator": "max",
+      "threshold": 6.0,
+      "step_downs": [
+        {"date": "2026-12-31", "threshold": 6.75},
+        {"date": "2028-03-31", "threshold": 6.0},
+        {"date": "2028-06-30", "threshold": 5.5},
+        {"date": "2028-09-30", "threshold": 5.25},
+        {"date": "2028-12-31", "threshold": 4.5},
+        {"date": "2029-03-31", "threshold": 3.75}
+      ],
+      "effective_from": null,
+      "test_frequency": "quarterly",
+      "measurement_quarters": 4,
+      "nets_cash": false,
+      "addbacks": [],
+      "addback_cap_pct": null,
+      "source_quote": "The U.S. Borrower shall maintain as of the last day of each Fiscal Quarter a Leverage Ratio of not more than 3.75:1.00; provided , however , that notwithstanding the foregoing, during the Covenant Relief Period, the U.S. Borrower shall maintain as of the last day of each Fiscal Quarter a Leverage Ratio of not more than the applicable level"
+    },
+    {
+      "kind": "interest_cover",
+      "comparator": "min",
+      "threshold": 2.0,
+      "step_downs": [
+        {"date": "2027-09-30", "threshold": 2.25},
+        {"date": "2028-03-31", "threshold": 2.5},
+        {"date": "2029-03-31", "threshold": 3.5}
+      ],
+      "effective_from": null,
+      "test_frequency": "quarterly",
+      "measurement_quarters": 4,
+      "nets_cash": false,
+      "addbacks": [],
+      "addback_cap_pct": null,
+      "source_quote": "The U.S. Borrower shall maintain an Interest Coverage Ratio, as determined as of the last day of each Fiscal Quarter, for the four consecutive Fiscal Quarters ending on such day, of not less than 3.50 to 1.00"
+    },
+    {
+      "kind": "leverage",
+      "comparator": "max",
+      "threshold": 3.5,
+      "step_downs": [],
+      "effective_from": null,
+      "test_frequency": "quarterly",
+      "measurement_quarters": 4,
+      "nets_cash": false,
+      "addbacks": [],
+      "addback_cap_pct": null,
+      "source_quote": "The U.S. Borrower shall maintain as of the last day of each Fiscal Quarter a Secured Leverage Ratio of not more than 3.50 to 1.00."
+    }
+  ],
+  "facility": {
+    "size": null,
+    "maturity": null,
+    "margin_pct": null,
+    "base_rate_name": null,
+    "source_quote": ""
+  }
+}

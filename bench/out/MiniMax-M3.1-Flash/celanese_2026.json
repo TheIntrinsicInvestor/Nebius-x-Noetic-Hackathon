@@ -1,0 +1,31 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 5.5,
+   "step_downs": [],
+   "effective_from": "2027-03-31",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "increases the consolidated net leverage ratio financial covenant level applicable under the Revolving Credit Agreement from the fiscal quarter ending March 31, 2027 through the maturity date to initially 5.50:1.00"
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": null,
+  "source_quote": ""
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 2042,
+  "completion_tokens": 147,
+  "latency_s": 1.9455171000445262,
+  "cost_usd": 0.0003945
+ }
+}

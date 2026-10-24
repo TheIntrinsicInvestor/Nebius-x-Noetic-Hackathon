@@ -1,0 +1,80 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.5,
+   "step_downs": [
+    {
+     "date": "2025-12-31",
+     "threshold": 2.5
+    }
+   ],
+   "effective_from": "2025-09-30",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "provision for income taxes",
+    "depreciation and amortization",
+    "non-cash translation losses from Mexico operations",
+    "non-recurring or one-time cash charges, losses, or expenses"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Leverage Ratio ... beginning with the fiscal quarter ending September 30, 2025, to be greater than the level set forth below for such date: Fiscal Quarter Ending Consolidated Leverage Ratio September 30, 2025 3.50 to 1.00 December 31, 2025 and thereafter 2.50 to 1.00"
+  },
+  {
+   "kind": "fixed_charge_cover",
+   "comparator": "min",
+   "threshold": 1.25,
+   "step_downs": [],
+   "effective_from": "2025-09-30",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "provision for income taxes",
+    "depreciation and amortization",
+    "non-cash translation losses from Mexico operations",
+    "non-recurring or one-time cash charges, losses, or expenses"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Fixed Charge Coverage Ratio ... beginning with the fiscal quarter ending September 30, 2025, to be less than 1.25 to 1.00."
+  },
+  {
+   "kind": "min_ebitda",
+   "comparator": "min",
+   "threshold": 1600000,
+   "step_downs": [],
+   "effective_from": "2025-06-30",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "provision for income taxes",
+    "depreciation and amortization",
+    "non-cash translation losses from Mexico operations",
+    "non-recurring or one-time cash charges, losses, or expenses"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit Consolidated EBITDA as of the end of the Measurement Periods ending June 30, 2025 and September 30, 2025 to be less than $1,600,000."
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": "Base Rate",
+  "source_quote": "Applicable Rate Level Consolidated Leverage Ratio Term SOFR for Revolving Loans & Letter of Credit Fee Base Rate for Revolving Loans Commitment Fee 1 <2.50 1.75% 0.75% 0.20% 2 \u22652.50 2.75% 1.75% 0.20%"
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 3978,
+  "completion_tokens": 596,
+  "latency_s": 4.265700999996625,
+  "cost_usd": 0.0009542999999999999
+ }
+}

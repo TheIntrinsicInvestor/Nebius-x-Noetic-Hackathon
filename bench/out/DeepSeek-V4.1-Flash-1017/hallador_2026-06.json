@@ -1,0 +1,53 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 4.25,
+   "step_downs": [],
+   "effective_from": "2026-06-30",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "(i) as of the last day of each quarter ending on or after June 30, 2026, the Company\u2019s total leverage ratio may not exceed 4.25 to 1.0"
+  },
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.0,
+   "step_downs": [
+    {
+     "date": "2026-12-31",
+     "threshold": 2.75
+    },
+    {
+     "date": "2027-06-30",
+     "threshold": 2.5
+    }
+   ],
+   "effective_from": "2026-06-30",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "(ii) as of June 30, 2026 and September 30, 2026, the Company\u2019s senior secured leverage ratio may not exceed 3.00 to 1.0, (iii) as of December 31, 2026 and March 31, 2027, the Company\u2019s senior secured leverage ratio may not exceed 2.75 to 1.0"
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": null,
+  "source_quote": ""
+ },
+ "_stats": {
+  "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+  "prompt_tokens": 1894,
+  "completion_tokens": 3541,
+  "latency_s": 6.526503999950364,
+  "cost_usd": 0.0048173999999999995
+ }
+}

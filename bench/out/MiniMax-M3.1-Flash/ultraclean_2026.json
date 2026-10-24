@@ -1,0 +1,31 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 6.0,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "increase such maximum consolidated total gross leverage ratio to 6.00 to 1.00 for a specified period of time on terms to be set forth in such amendment"
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": null,
+  "source_quote": "the Company\u2019s revolving credit facility thereunder"
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 1822,
+  "completion_tokens": 139,
+  "latency_s": 1.213752600015141,
+  "cost_usd": 0.0003567
+ }
+}

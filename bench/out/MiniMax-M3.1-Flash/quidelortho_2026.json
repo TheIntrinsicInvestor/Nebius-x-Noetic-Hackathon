@@ -1,0 +1,70 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 5.5,
+   "step_downs": [
+    {
+     "date": "2028-10-01",
+     "threshold": 5.0
+    },
+    {
+     "date": "2029-04-01",
+     "threshold": 4.5
+    },
+    {
+     "date": "2029-09-30",
+     "threshold": 4.25
+    }
+   ],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "On or prior to July 2, 2028 2.25 to 1.00 5.50 to 1.00 On October 1, 2028 or December 31, 2028 2.50 to 1.00 5.00 to 1.00 On April 1, 2029 or July 1, 2029 2.75 to 1.00 4.50 to 1.00 On or after September 30, 2029 3.00 to 1.00 4.25 to 1.00"
+  },
+  {
+   "kind": "interest_cover",
+   "comparator": "min",
+   "threshold": 2.25,
+   "step_downs": [
+    {
+     "date": "2028-10-01",
+     "threshold": 2.5
+    },
+    {
+     "date": "2029-04-01",
+     "threshold": 2.75
+    },
+    {
+     "date": "2029-09-30",
+     "threshold": 3.0
+    }
+   ],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "On or prior to July 2, 2028 2.25 to 1.00 5.50 to 1.00 On October 1, 2028 or December 31, 2028 2.50 to 1.00 5.00 to 1.00 On April 1, 2029 or July 1, 2029 2.75 to 1.00 4.50 to 1.00 On or after September 30, 2029 3.00 to 1.00 4.25 to 1.00"
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": 1.5,
+  "base_rate_name": "base rate",
+  "source_quote": "the initial applicable rate for the Term Loan A Facilities and the Revolving Credit Facility from the Amendment effective date until the first business day after the compliance certificate for the fiscal quarter ending September 28, 2026 is received by the Administrative Agent will be 1.50% per annum for base rate loans and 2.50% per annum for Term SOFR rate loans"
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 2326,
+  "completion_tokens": 582,
+  "latency_s": 2.8040188999148086,
+  "cost_usd": 0.0006980999999999999
+ }
+}

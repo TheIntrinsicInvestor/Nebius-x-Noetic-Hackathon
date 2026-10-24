@@ -1,0 +1,31 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.5,
+   "step_downs": [],
+   "effective_from": "2026-12-31",
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "the Loan Parties\u2019 financial covenant obligation to maintain a Leverage Ratio (as defined in the Credit Agreement) not to exceed 3.50:1.00, such that the Loan Parties will not be required to be in compliance with such financial covenant for any period until the Calculation Date (as defined in the Credit Agreement) occurring on December 31, 2026 (and thereafter)"
+  }
+ ],
+ "facility": {
+  "size": 370100000,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": null,
+  "source_quote": "in respect of its \u20ac370.1 million revolving credit facility (the \u201cGerman Facility\u201d)"
+ },
+ "_stats": {
+  "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+  "prompt_tokens": 2379,
+  "completion_tokens": 202,
+  "latency_s": 1.4821846999693662,
+  "cost_usd": 0.00047804999999999994
+ }
+}

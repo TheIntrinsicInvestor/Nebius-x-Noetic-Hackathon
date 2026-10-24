@@ -1,0 +1,6 @@
+{
+ "covenants": [],
+ "_stats": {
+  "error": "ValueError('deepseek-ai/DeepSeek-V4.1-Flash-1017 returned invalid JSON twice: the JSON object must be str, bytes or bytearray, not NoneType')"
+ }
+}

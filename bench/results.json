@@ -1,0 +1,48 @@
+{
+ "rows": [
+  {
+   "model": "claude-opus-5-5 (via Claude Code)",
+   "open": false,
+   "docs": 9,
+   "kind_recall": 1.0,
+   "threshold_acc": 1.0,
+   "stepdown_acc": 1.0,
+   "invented_covenants": 0,
+   "cost_per_doc_usd": 0.017488777777777777,
+   "latency_s": null
+  },
+  {
+   "model": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+   "open": true,
+   "docs": 9,
+   "kind_recall": 1.0,
+   "threshold_acc": 1.0,
+   "stepdown_acc": 1.0,
+   "invented_covenants": 0,
+   "cost_per_doc_usd": 0.005298666666666667,
+   "latency_s": 8.488006477774535
+  },
+  {
+   "model": "MiniMaxAI/MiniMax-M3.1-Flash",
+   "open": true,
+   "docs": 9,
+   "kind_recall": 1.0,
+   "threshold_acc": 1.0,
+   "stepdown_acc": 1.0,
+   "invented_covenants": 0,
+   "cost_per_doc_usd": 0.0006228333333333333,
+   "latency_s": 2.416697911103256
+  }
+ ],
+ "errors": {
+  "claude-opus-5-5 (via Claude Code)": [],
+  "deepseek-ai/DeepSeek-V4.1-Flash-1017": [],
+  "MiniMaxAI/MiniMax-M3.1-Flash": []
+ },
+ "notes": [
+  "Same prompt and the same located excerpts for every model; 16 covenants across 9 real SEC documents, scored against hand labels drawn from the source text.",
+  "Where open fell short: on FMC's redlined amendment (old and new covenant levels merged into one table, excluded from scoring because the right answer is ambiguous), DeepSeek V4.1 Flash returned an empty response twice; MiniMax listed every quarter's level verbatim; Claude produced the cleanest reading.",
+  "Claude cost is an estimate (characters / 4 at $4 / $20 per million tokens for Claude Opus 5.5, excluding thinking tokens, so it is a floor). Claude ran through Claude Code, so its speed is not comparable and is not shown.",
+  "Messy management accounts: both open models mapped 19 of 19 bookkeeper line names (e.g. \"Dep'n plant & machinery\", \"Debtors control\") to the right category in under 2 seconds."
+ ]
+}

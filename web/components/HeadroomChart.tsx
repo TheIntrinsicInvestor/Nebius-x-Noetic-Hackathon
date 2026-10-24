@@ -15,6 +15,7 @@ import type { CovenantPoint } from "@/lib/types";
 import { Pill } from "./ui";
 
 const ACCENT = "#0e2742";
+const FORECAST = "#1a8fa6";
 const LIMIT = "#5a6a74";
 const BREACH = "#b42318";
 
@@ -82,7 +83,7 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
       const key = `${series}-${index}`;
       if (cx == null || cy == null || !payload) return <g key={key} />;
       if (series === "forecast" && !payload.p.is_forecast) return <g key={key} />;
-      const color = payload.p.breached ? BREACH : ACCENT;
+      const color = payload.p.breached ? BREACH : series === "forecast" ? FORECAST : ACCENT;
       return (
         <g key={key}>
           <circle cx={cx} cy={cy} r={payload.p.breached ? 4.5 : 3} fill={payload.p.breached ? BREACH : "#fff"} stroke={color} strokeWidth={2} />
@@ -115,7 +116,7 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
               <ReferenceArea
                 x1={firstFc.label}
                 x2={rows[rows.length - 1].label}
-                fill="#f3f6f7"
+                fill="#eaf4f8"
                 fillOpacity={1}
                 label={{ value: "Forecast", position: "insideTopRight", fontSize: 10, fill: "#8a979f" }}
               />
@@ -132,7 +133,7 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
             />
             <Line type="stepAfter" dataKey="threshold" stroke={LIMIT} strokeWidth={1.5} dot={false} isAnimationActive={false} />
             <Line type="linear" dataKey="actual" stroke={ACCENT} strokeWidth={2} dot={dot("actual")} activeDot={false} connectNulls={false} isAnimationActive={false} />
-            <Line type="linear" dataKey="forecast" stroke={ACCENT} strokeWidth={2} strokeDasharray="5 4" dot={dot("forecast")} activeDot={false} connectNulls={false} isAnimationActive={false} />
+            <Line type="linear" dataKey="forecast" stroke={FORECAST} strokeWidth={2} strokeDasharray="5 4" dot={dot("forecast")} activeDot={false} connectNulls={false} isAnimationActive={false} />
           </ComposedChart>
         </ResponsiveContainer>
       </div>
@@ -173,7 +174,7 @@ export function ChartLegend() {
   return (
     <div className="flex items-center gap-3 text-[11px] text-muted">
       <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={ACCENT} strokeWidth="2" /></svg>Actual</span>
-      <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={ACCENT} strokeWidth="2" strokeDasharray="4 3" /></svg>Forecast</span>
+      <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={FORECAST} strokeWidth="2" strokeDasharray="4 3" /></svg>Forecast</span>
       <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={LIMIT} strokeWidth="1.5" /></svg>Limit</span>
       <span className="flex items-center gap-1"><svg width="8" height="8"><circle cx="4" cy="4" r="3.5" fill={BREACH} /></svg>Breach</span>
     </div>

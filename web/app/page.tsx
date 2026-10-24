@@ -129,7 +129,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="bg-navy text-paper">
+      <header className="border-t-[3px] border-teal bg-navy text-paper">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 pb-3 pt-4">
           <div className="flex items-baseline gap-4">
             <span className="font-serif text-[28px] font-bold leading-none tracking-tight text-white">NorthStar</span>
@@ -157,10 +157,10 @@ export default function Home() {
                 disabled={disabled}
                 title={disabled ? "Load a company first" : undefined}
                 className={`flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition ${
-                  active ? "border-white font-semibold text-white" : "border-transparent text-paper/70 hover:text-white"
+                  active ? "border-sky font-semibold text-white" : "border-transparent text-paper/70 hover:text-white"
                 } disabled:cursor-not-allowed disabled:opacity-40`}
               >
-                <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${active ? "bg-white text-navy" : "bg-white/10 text-paper/80"}`}>
+                <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${active ? "bg-sky text-navy" : "bg-white/10 text-paper/80"}`}>
                   {i + 1}
                 </span>
                 {t.label}

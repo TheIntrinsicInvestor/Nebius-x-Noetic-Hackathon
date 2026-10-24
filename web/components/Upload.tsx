@@ -177,7 +177,7 @@ export default function Upload({ onLoad, loading, error }: {
           {SAMPLES.map((s, i) => (
             <span key={s.name}>
               {i > 0 && " · "}
-              <button onClick={() => playSample(s)} disabled={busy || loading !== null} className="text-accent underline underline-offset-2 disabled:opacity-50">
+              <button onClick={() => playSample(s)} disabled={busy || loading !== null} className="font-medium text-teal underline underline-offset-2 disabled:opacity-50">
                 {s.label}
               </button>
             </span>
@@ -226,7 +226,7 @@ function Steps({ hasBudget, stepMs = STEP_MS }: { hasBudget: boolean; stepMs?: n
         {steps.map((_, i) => (
           <div key={i} className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
             <div
-              className={`h-full rounded-full bg-navy transition-[width] ease-linear ${i === step ? "animate-pulse" : ""}`}
+              className={`h-full rounded-full transition-[width] ease-linear ${i === step ? "animate-pulse bg-teal" : "bg-navy"}`}
               style={{ width: i < step ? "100%" : i === step ? "60%" : "0%", transitionDuration: i === step ? `${stepMs}ms` : "300ms" }}
             />
           </div>
@@ -236,7 +236,7 @@ function Steps({ hasBudget, stepMs = STEP_MS }: { hasBudget: boolean; stepMs?: n
         {steps.map((s, i) => (
           <li key={s} className={`flex items-center gap-2 ${i < step ? "text-muted" : i === step ? "font-medium text-ink" : "text-faint"}`}>
             <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${
-              i < step ? "bg-navy text-white" : i === step ? "border-2 border-navy" : "border border-line"
+              i < step ? "bg-navy text-white" : i === step ? "border-2 border-teal" : "border border-line"
             }`}>
               {i < step ? "✓" : ""}
             </span>
@@ -271,7 +271,7 @@ function Drop({ label, hint, accept, file, onFile }: {
       onDragLeave={() => setOver(false)}
       onDrop={(e) => { e.preventDefault(); setOver(false); onFile(e.dataTransfer.files?.[0] ?? null); }}
       className={`flex min-h-[110px] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed px-3 py-4 text-center text-sm transition ${
-        over ? "border-accent bg-accent-soft" : file ? "border-ok bg-ok-soft" : "border-line bg-canvas hover:border-accent"
+        over ? "border-teal bg-teal-soft" : file ? "border-ok bg-ok-soft" : "border-line bg-canvas hover:border-teal hover:bg-teal-soft"
       }`}
     >
       <input type="file" accept={accept} className="sr-only" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />

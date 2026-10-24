@@ -11,7 +11,10 @@ export function Card({ title, aside, children, className = "" }: {
     <section className={`rounded-lg border border-line bg-surface ${className}`}>
       {(title || aside) && (
         <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-2.5">
-          <h2 className="font-serif text-[16px] font-semibold text-ink">{title}</h2>
+          <h2 className="flex items-center gap-2 font-serif text-[16px] font-semibold text-ink">
+            <span aria-hidden className="h-3.5 w-[3px] rounded-full bg-teal" />
+            {title}
+          </h2>
           {aside && <div className="text-xs text-muted">{aside}</div>}
         </header>
       )}
@@ -55,6 +58,6 @@ export function Quote({ text }: { text: string }) {
 
 export function Spinner() {
   return (
-    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-accent/30 border-t-accent align-[-2px]" />
+    <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-teal/30 border-t-teal align-[-2px]" />
   );
 }

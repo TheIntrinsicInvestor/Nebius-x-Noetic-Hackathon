@@ -1,14 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --canvas: #ececec;
+  --canvas: #eceff3;
   --surface: #ffffff;
   --ink: #0e2742;
   --muted: #4f5d6e;
   --faint: #8792a0;
-  --line: #d9dce1;
+  --line: #d9dee5;
   --accent: #0e2742;
-  --accent-soft: #e6eaf0;
+  --accent-soft: #e3f1f7;
+  --teal: #1a8fa6;
+  --teal-soft: #e3f3f6;
+  --sky: #7cc4e4;
   --navy: #0e2742;
   --paper: #d9d9d9;
   --breach: #b42318;
@@ -34,6 +37,9 @@
   --color-warn-soft: var(--warn-soft);
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+  --color-sky: var(--sky);
   --color-navy: var(--navy);
   --color-paper: var(--paper);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
@@ -56,7 +62,7 @@ body {
 }
 
 input[type="range"] {
-  accent-color: var(--accent);
+  accent-color: var(--teal);
 }
 
 @keyframes shimmer {

@@ -38,6 +38,8 @@ def _points(history: list[Quarter], cs: CovenantSet, sc: Scenario, n: int):
         for i in range(cov.measurement_quarters - 1, len(series)):
             d = series[i].period_end
             thr = threshold_at(cov, d)
+            if thr is None:
+                continue
             v = metric_value(cov, series, i)
             h = headroom_pct(cov, v, thr)
             points.append(CovenantPoint(period_end=d, kind=cov.kind, value=v, threshold=thr,

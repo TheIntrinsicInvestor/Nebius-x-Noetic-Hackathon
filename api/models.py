@@ -16,6 +16,7 @@ class Covenant(BaseModel):
     comparator: Literal["max", "min"]
     threshold: float | None
     step_downs: list[StepDown] = []
+    effective_from: date | None = None
     test_frequency: Literal["quarterly", "monthly", "annual"] = "quarterly"
     measurement_quarters: int = 4
     nets_cash: bool = True

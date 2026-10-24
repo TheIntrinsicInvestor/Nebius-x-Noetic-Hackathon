@@ -26,6 +26,12 @@ def test_threshold_step_down():
     assert threshold_at(cov, date(2027, 6, 30)) == 3.75
 
 
+def test_threshold_none_before_effective_from():
+    cov = Covenant(kind="min_ebitda", comparator="min", threshold=1.0, effective_from=date(2025, 6, 30))
+    assert threshold_at(cov, date(2025, 3, 31)) is None
+    assert threshold_at(cov, date(2025, 6, 30)) == 1.0
+
+
 def test_leverage():
     q = quarters()
     cov = Covenant(kind="leverage", comparator="max", threshold=3.0)

@@ -41,6 +41,12 @@ def test_missing_threshold_goes_to_needs_input():
     assert all(p.kind != "fixed_charge_cover" for p in a.points)
 
 
+def test_no_points_before_effective_from():
+    lev = Covenant(kind="leverage", comparator="max", threshold=3.0, effective_from=date(2026, 6, 30))
+    a = analyze(flat_history(), cs(lev), n=4)
+    assert min(p.period_end for p in a.points) == date(2026, 6, 30)
+
+
 def test_reverse_stress_is_the_breach_boundary():
     lev = Covenant(kind="leverage", comparator="max", threshold=3.0)
     a = analyze(flat_history(), cs(lev), n=6)

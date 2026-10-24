@@ -5,7 +5,9 @@ from api.models import Covenant, Quarter
 
 
 def threshold_at(cov: Covenant, d: date) -> float | None:
-    """Latest step-down on or before d, else the base threshold."""
+    """Latest step-down on or before d, else the base threshold. None before the covenant applies."""
+    if cov.effective_from and d < cov.effective_from:
+        return None
     t = cov.threshold
     for s in sorted(cov.step_downs, key=lambda s: s.date):
         if s.date <= d:

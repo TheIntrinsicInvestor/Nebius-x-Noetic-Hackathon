@@ -1,0 +1,47 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": null,
+   "step_downs": [],
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Section 7.11(a) of the Credit Agreement (Consolidated Leverage Ratio) for the fiscal quarter ended December 31, 2025"
+  },
+  {
+   "kind": "fixed_charge_cover",
+   "comparator": "min",
+   "threshold": null,
+   "step_downs": [],
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Section 7.11(b) of the Credit Agreement (Consolidated Fixed Charge Coverage Ratio) for the fiscal quarter ended December 31, 2025"
+  },
+  {
+   "kind": "min_ebitda",
+   "comparator": "min",
+   "threshold": null,
+   "step_downs": [],
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [],
+   "addback_cap_pct": null,
+   "source_quote": "Section 7.11(c) of the Credit Agreement (Consolidated EBITDA) for the fiscal quarter ended December 31, 2025"
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": null,
+  "base_rate_name": null,
+  "source_quote": "The Revolving Commitment shall be: (x) for the period commencing on the Closing Date and continuing through March 31, 2026, $15,000,000; and (y) for the period commencing April 1, 2026 and continuing until the Maturity Date, $12,000,000."
+ }
+}

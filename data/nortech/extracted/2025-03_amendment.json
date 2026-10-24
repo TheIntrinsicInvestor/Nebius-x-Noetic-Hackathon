@@ -1,0 +1,70 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.5,
+   "step_downs": [
+    {
+     "date": "2025-12-31",
+     "threshold": 2.5
+    }
+   ],
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "non-cash translation losses",
+    "non-recurring or one-time cash charges (restructuring, integration, severance, relocation, facility closure)"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "to be greater than the level set forth below for such date: Fiscal Quarter Ending Consolidated Leverage Ratio September 30, 2025 3.50 to 1.00 December 31, 2025 and thereafter 2.50 to 1.00"
+  },
+  {
+   "kind": "fixed_charge_cover",
+   "comparator": "min",
+   "threshold": 1.25,
+   "step_downs": [],
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "non-cash translation losses",
+    "non-recurring or one-time cash charges (restructuring, integration, severance, relocation, facility closure)"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit the Consolidated Fixed Charge Coverage Ratio of the Borrower and its Subsidiaries as of the end of any Measurement Period ending as of the last day of any fiscal quarter of the Borrower, beginning with the fiscal quarter ending September 30, 2025, to be less than 1.25 to 1.00."
+  },
+  {
+   "kind": "min_ebitda",
+   "comparator": "min",
+   "threshold": 1600000.0,
+   "step_downs": [],
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Consolidated Interest Charges",
+    "income taxes",
+    "depreciation and amortization",
+    "non-cash translation losses",
+    "non-recurring or one-time cash charges (restructuring, integration, severance, relocation, facility closure)"
+   ],
+   "addback_cap_pct": 0.1,
+   "source_quote": "Permit Consolidated EBITDA as of the end of the Measurement Periods ending June 30, 2025 and September 30, 2025 to be less than $1,600,000."
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": null,
+  "margin_pct": 2.75,
+  "base_rate_name": "Term SOFR",
+  "source_quote": "Term SOFR for Revolving Loans & Letter of Credit Fee Base Rate for Revolving Loans Commitment Fee 1 <2.50 1.75% 0.75% 0.20% 2 ≥2.50 2.75% 1.75% 0.20% As of the Amendment No. 1 Effective Date, the Applicable Rate shall be set at Level 2."
+ }
+}

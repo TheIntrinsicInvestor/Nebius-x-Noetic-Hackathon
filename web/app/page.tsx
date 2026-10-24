@@ -1,103 +1,205 @@
-import Image from "next/image";
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import Benchmark from "@/components/Benchmark";
+import Dashboard from "@/components/Dashboard";
+import Outbound from "@/components/Outbound";
+import Review from "@/components/Review";
+import Upload from "@/components/Upload";
+import { analyze, errorMessage, getCase } from "@/lib/api";
+import { isZeroScenario } from "@/lib/format";
+import type { Analysis, CaseData, CaseName, CovenantSet, Insight, Scenario } from "@/lib/types";
+import { ZERO_SCENARIO } from "@/lib/types";
+
+type Tab = "upload" | "review" | "dashboard" | "benchmark";
+
+const TABS: { id: Tab; label: string }[] = [
+  { id: "upload", label: "Upload" },
+  { id: "review", label: "Review" },
+  { id: "dashboard", label: "Dashboard" },
+  { id: "benchmark", label: "Open vs Closed" },
+];
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [tab, setTab] = useState<Tab>("upload");
+  const [caseName, setCaseName] = useState<CaseName | null>(null);
+  const [caseData, setCaseData] = useState<CaseData | null>(null);
+  const [covenants, setCovenants] = useState<CovenantSet | null>(null);
+  // covenants differ from the case's own (edited or uploaded): send them to /analyze
+  const [override, setOverride] = useState(false);
+  const [loadingCase, setLoadingCase] = useState<string | null>(null);
+  const [caseError, setCaseError] = useState<string | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const [scenario, setScenario] = useState<Scenario>(ZERO_SCENARIO);
+  const [base, setBase] = useState<Analysis | null>(null);
+  const [live, setLive] = useState<Analysis | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+
+  const [insights, setInsights] = useState<Insight[] | null>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [insightsError, setInsightsError] = useState<string | null>(null);
+
+  const baseReq = useRef(0);
+  const liveReq = useRef(0);
+  const insightReq = useRef(0);
+
+  const runInsights = useCallback((name: CaseName, cs: CovenantSet | null) => {
+    const id = ++insightReq.current;
+    setInsightsLoading(true);
+    setInsightsError(null);
+    analyze({ case: name, covenants: cs, scenario: ZERO_SCENARIO, insights: true })
+      .then((r) => { if (id === insightReq.current) setInsights(r.insights); })
+      .catch((e) => { if (id === insightReq.current) setInsightsError(errorMessage(e)); })
+      .finally(() => { if (id === insightReq.current) setInsightsLoading(false); });
+  }, []);
+
+  async function loadCase(name: CaseName, uploaded?: CovenantSet) {
+    setLoadingCase(name);
+    setCaseError(null);
+    try {
+      const d = await getCase(name);
+      setCaseName(name);
+      setCaseData(d);
+      setCovenants(uploaded ?? d.covenants);
+      setOverride(!!uploaded);
+      setScenario(ZERO_SCENARIO);
+      setBase(null);
+      setLive(null);
+      setInsights(null);
+      setAnalysisError(null);
+      runInsights(name, uploaded ?? null);
+      setTab("review");
+    } catch (e) {
+      setCaseError(errorMessage(e));
+    } finally {
+      setLoadingCase(null);
+    }
+  }
+
+  // Base case: re-run whenever the case or covenants change.
+  useEffect(() => {
+    if (!caseName || !covenants) return;
+    const id = ++baseReq.current;
+    const t = setTimeout(() => {
+      analyze({ case: caseName, covenants: override ? covenants : null, scenario: ZERO_SCENARIO, insights: false })
+        .then((r) => { if (id === baseReq.current) { setBase(r.analysis); setAnalysisError(null); } })
+        .catch((e) => { if (id === baseReq.current) setAnalysisError(errorMessage(e)); });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [caseName, covenants, override]);
+
+  // What-if: debounced 250ms, only when a slider is off zero.
+  useEffect(() => {
+    const id = ++liveReq.current;
+    if (!caseName || !covenants || isZeroScenario(scenario)) {
+      setBusy(false);
+      return;
+    }
+    setBusy(true);
+    const t = setTimeout(() => {
+      analyze({ case: caseName, covenants: override ? covenants : null, scenario, insights: false })
+        .then((r) => { if (id === liveReq.current) { setLive(r.analysis); setAnalysisError(null); } })
+        .catch((e) => { if (id === liveReq.current) setAnalysisError(errorMessage(e)); })
+        .finally(() => { if (id === liveReq.current) setBusy(false); });
+    }, 250);
+    return () => clearTimeout(t);
+  }, [caseName, covenants, override, scenario]);
+
+  function setThreshold(i: number, v: number | null) {
+    if (!covenants) return;
+    const next: CovenantSet = {
+      ...covenants,
+      covenants: covenants.covenants.map((c, j) => (j === i ? { ...c, threshold: v } : c)),
+    };
+    setCovenants(next);
+    setOverride(true);
+  }
+
+  function resetCovenants() {
+    if (!caseData) return;
+    setCovenants(caseData.covenants);
+    setOverride(false);
+  }
+
+  const shown = isZeroScenario(scenario) ? base : live ?? base;
+  const needsCase = (t: Tab) => (t === "review" || t === "dashboard") && !caseData;
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <header className="border-b border-line bg-surface">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-3">
+          <div className="flex items-baseline gap-3">
+            <span className="text-lg font-bold tracking-tight text-accent">Headroom</span>
+            <span className="hidden text-sm text-muted md:inline">See the covenant breach before your bank does.</span>
+          </div>
+          {caseData && (
+            <div className="min-w-0 text-right">
+              <div className="truncate text-sm font-semibold">{caseData.meta.display_name}</div>
+              <div className="truncate text-xs text-muted max-w-[560px]">{caseData.meta.description}</div>
+              <div className="truncate text-[11px] text-faint max-w-[560px]">
+                {[caseData.meta.sector, caseData.meta.country, caseData.meta.lender, caseData.meta.base_rate].filter(Boolean).join(" · ")}
+              </div>
+            </div>
+          )}
         </div>
+        <nav className="mx-auto flex max-w-[1400px] gap-1 px-6">
+          {TABS.map((t, i) => {
+            const disabled = needsCase(t.id);
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => !disabled && setTab(t.id)}
+                disabled={disabled}
+                title={disabled ? "Load a company first" : undefined}
+                className={`flex items-center gap-2 border-b-2 px-3 py-2.5 text-sm transition ${
+                  active ? "border-accent font-semibold text-ink" : "border-transparent text-muted hover:text-ink"
+                } disabled:cursor-not-allowed disabled:opacity-40`}
+              >
+                <span className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold ${active ? "bg-accent text-white" : "bg-canvas text-muted"}`}>
+                  {i + 1}
+                </span>
+                {t.label}
+              </button>
+            );
+          })}
+        </nav>
+      </header>
+
+      <main className="mx-auto w-full max-w-[1400px] flex-1 px-6 py-6">
+        {tab === "upload" && <Upload onLoad={loadCase} loading={loadingCase} error={caseError} />}
+        {tab === "review" && covenants && caseData && (
+          <Review
+            covenants={covenants}
+            currency={caseData.meta.currency}
+            needsInput={base?.needs_input ?? []}
+            edited={override}
+            onThreshold={setThreshold}
+            onReset={resetCovenants}
+            onContinue={() => setTab("dashboard")}
+          />
+        )}
+        {tab === "dashboard" && caseData && covenants && (
+          <Dashboard
+            caseData={caseData}
+            covenants={covenants}
+            base={base}
+            live={shown}
+            scenario={scenario}
+            onScenario={setScenario}
+            busy={busy}
+            error={analysisError}
+            insights={insights}
+            insightsLoading={insightsLoading}
+            insightsError={insightsError}
+            onRefreshInsights={() => caseName && runInsights(caseName, override ? covenants : null)}
+          />
+        )}
+        {tab === "benchmark" && <Benchmark />}
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+      <Outbound />
     </div>
   );
 }

@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --canvas: #f4f6f7;
+  --surface: #ffffff;
+  --ink: #12212b;
+  --muted: #5a6a74;
+  --faint: #8a979f;
+  --line: #dde3e7;
+  --accent: #0d5c63;
+  --accent-soft: #e5f0f1;
+  --breach: #b42318;
+  --breach-soft: #fdeceb;
+  --warn: #b54708;
+  --warn-soft: #fef3e4;
+  --ok: #0b6b4f;
+  --ok-soft: #e7f4ee;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-breach: var(--breach);
+  --color-breach-soft: var(--breach-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html,
+body {
+  background: var(--canvas);
+  color: var(--ink);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="range"] {
+  accent-color: var(--accent);
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.55; }
+  50% { opacity: 1; }
+  100% { opacity: 0.55; }
+}
+
+.skeleton {
+  background: #e7ecef;
+  border-radius: 4px;
+  animation: shimmer 1.4s ease-in-out infinite;
 }

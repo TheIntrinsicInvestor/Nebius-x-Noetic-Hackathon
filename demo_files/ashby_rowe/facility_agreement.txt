@@ -1,0 +1,25 @@
+FACILITIES AGREEMENT dated 31 March 2023 between ASHBY & ROWE ENGINEERING LIMITED (the "Company") and
+NORTHGATE BANK PLC (the "Lender"). £12,000,000 term loan facility and £6,000,000 revolving credit facility.
+
+1. DEFINITIONS
+"Consolidated EBITDA" means, in respect of any Relevant Period, the operating profit of the Group before taxation,
+before deducting any Finance Costs, before taking into account any Exceptional Items (provided that exceptional
+restructuring costs added back shall not exceed 10 per cent. of Consolidated EBITDA in any Relevant Period), and
+before deducting any amount attributable to the amortisation of intangible assets or depreciation of tangible assets.
+"Interest Cover" means the ratio of Consolidated EBITDA to Finance Charges in respect of any Relevant Period.
+"Leverage" means the ratio of Total Net Debt on the last day of a Relevant Period to Consolidated EBITDA in respect
+of that Relevant Period.
+"Total Net Debt" means the aggregate amount of all obligations of the Group for or in respect of Borrowings, less
+cash and cash equivalent investments held by the Group.
+"Relevant Period" means each period of twelve months ending on a Quarter Date.
+"Termination Date" means 31 March 2028.
+"Margin" means 3.00 per cent. per annum over Compounded Reference Rate (SONIA).
+
+21. FINANCIAL COVENANTS
+21.1 Financial condition. The Company shall ensure that:
+(a) Leverage: Leverage in respect of any Relevant Period shall not exceed 3.25:1 for each Relevant Period ending
+on or before 31 December 2024, 3.00:1 for each Relevant Period ending on or before 31 December 2026 and 2.50:1
+thereafter.
+(b) Interest Cover: Interest Cover in respect of any Relevant Period shall not be less than 3.00:1.
+21.2 Financial testing. The financial covenants shall be tested by reference to each of the financial statements
+and each Compliance Certificate delivered quarterly.

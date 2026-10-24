@@ -59,7 +59,7 @@ def test_copilot_tool_uses_edited_covenants():
 def test_ask_endpoint_passes_covenants(monkeypatch):
     import api.main as m
     seen = {}
-    monkeypatch.setattr(m, "ask", lambda case, q, cs=None: seen.update(cs=cs) or {"answer": "ok"})
+    monkeypatch.setattr(m, "ask", lambda case, q, cs=None, model=None: seen.update(cs=cs) or {"answer": "ok"})
     body = client.get("/cases/sample_uk").json()["covenants"]
     client.post("/ask", json={"case": "sample_uk", "question": "x", "covenants": body})
     assert seen["cs"] is not None

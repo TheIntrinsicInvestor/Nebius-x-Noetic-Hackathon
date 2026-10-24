@@ -18,7 +18,7 @@ def _minus_months(d: date, months: int) -> date:
 
 def refi_summary(fac: Facility, as_of: date, debt: float) -> dict:
     out: dict = {"est_breach_cost": WAIVER_FEE * debt + MARGIN_STEP * debt,
-                 "breach_cost_assumption": "0.25% waiver fee (Nortech Q4 2025) + 1% margin step for a year"}
+                 "breach_cost_assumption": "0.25% waiver fee (as paid in real bank waivers) + 1% margin step for a year"}
     if fac.maturity:
         m = fac.maturity
         months = (m.year - as_of.year) * 12 + m.month - as_of.month - (1 if m.day < as_of.day else 0)

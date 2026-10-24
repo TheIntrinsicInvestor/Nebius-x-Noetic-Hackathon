@@ -70,7 +70,7 @@ def test_backtest_flags_q3_2024():
 
 def test_ask_endpoint_logs_and_returns_answer(monkeypatch):
     import api.main as m
-    monkeypatch.setattr(m, "ask", lambda case, q, cs=None: {"answer": "ok", "tool_calls": [], "unverified_numbers": []})
+    monkeypatch.setattr(m, "ask", lambda case, q, cs=None, model=None: {"answer": "ok", "tool_calls": [], "unverified_numbers": []})
     r = client.post("/ask", json={"case": "sample_uk", "question": "Can we spend 2m?"})
     assert r.status_code == 200
     assert r.json()["answer"] == "ok"

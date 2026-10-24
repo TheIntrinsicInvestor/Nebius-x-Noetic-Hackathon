@@ -1,5 +1,4 @@
 import type {
-  AgreementResponse,
   AnalyzeRequest,
   AnalyzeResponse,
   AskResponse,
@@ -7,6 +6,7 @@ import type {
   BenchmarkResponse,
   CaseData,
   CaseName,
+  CompanyResponse,
   CovenantSet,
   MarketResponse,
   OutboundCall,
@@ -51,10 +51,8 @@ export function analyze(body: AnalyzeRequest): Promise<AnalyzeResponse> {
   });
 }
 
-export function uploadAgreement(file: File): Promise<AgreementResponse> {
-  const form = new FormData();
-  form.append("file", file);
-  return request<AgreementResponse>("/agreement", { method: "POST", body: form });
+export function createCompany(form: FormData): Promise<CompanyResponse> {
+  return request<CompanyResponse>("/company", { method: "POST", body: form });
 }
 
 export async function getBacktest(): Promise<BacktestRow[]> {

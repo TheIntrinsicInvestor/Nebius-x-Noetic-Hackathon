@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from api.llm import PRIMARY_MODEL, CallStats, chat_json
 
 Category = Literal["revenue", "cogs", "opex", "da", "interest", "capex", "cash", "debt", "receivables",
-                   "inventory", "payables", "addbacks", "other"]
+                   "inventory", "payables", "principal", "addbacks", "other"]
 
 
 class MappedLine(BaseModel):
@@ -24,7 +24,7 @@ class _Mapped(BaseModel):
 SYSTEM = """You map a small company's management-account line names to standard categories used to test
 bank covenants. Categories: revenue, cogs (direct costs), opex (overheads), da (depreciation/amortisation),
 interest, capex, cash, debt (bank loans, RCF, overdraft), receivables (debtors), inventory (stock/WIP),
-payables (creditors), addbacks (exceptional/one-off items), other. Bookkeepers abbreviate (e.g. "Dep'n",
+payables (creditors), principal (scheduled loan repayments), addbacks (exceptional/one-off items), other. Bookkeepers abbreviate (e.g. "Dep'n",
 "int pd", "a/c"). Return every input line once, in order, with a confidence between 0 and 1."""
 
 

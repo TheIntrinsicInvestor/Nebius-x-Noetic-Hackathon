@@ -1,4 +1,5 @@
-export type CaseName = "nortech" | "sample_uk";
+// built-in samples ("nortech", "sample_uk") or an uploaded company ("u-...")
+export type CaseName = string;
 
 export type CovenantKind = "leverage" | "interest_cover" | "fixed_charge_cover" | "min_ebitda";
 
@@ -162,6 +163,20 @@ export interface ExtractionStats {
 export interface AgreementResponse {
   covenants: CovenantSet;
   stats: ExtractionStats;
+}
+
+export interface MappedLine {
+  name: string;
+  category: string;
+  confidence: number;
+}
+
+export interface CompanyResponse {
+  case: string;
+  covenants: CovenantSet;
+  mapping: MappedLine[];
+  quarters: number;
+  stats: { agreement: ExtractionStats; financials: ExtractionStats };
 }
 
 export interface BacktestRow {

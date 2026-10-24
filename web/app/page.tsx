@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Backtest from "@/components/Backtest";
 import Benchmark from "@/components/Benchmark";
 import Dashboard from "@/components/Dashboard";
 import Outbound from "@/components/Outbound";
@@ -11,12 +12,13 @@ import { isZeroScenario } from "@/lib/format";
 import type { Analysis, CaseData, CaseName, CovenantSet, Insight, Scenario } from "@/lib/types";
 import { ZERO_SCENARIO } from "@/lib/types";
 
-type Tab = "upload" | "review" | "dashboard" | "benchmark";
+type Tab = "upload" | "review" | "dashboard" | "track" | "benchmark";
 
 const TABS: { id: Tab; label: string }[] = [
   { id: "upload", label: "Upload" },
   { id: "review", label: "Review" },
   { id: "dashboard", label: "Dashboard" },
+  { id: "track", label: "Track record" },
   { id: "benchmark", label: "Open vs Closed" },
 ];
 
@@ -195,6 +197,16 @@ export default function Home() {
             insightsError={insightsError}
             onRefreshInsights={() => caseName && runInsights(caseName, override ? covenants : null)}
           />
+        )}
+        {tab === "track" && (
+          <div className="space-y-4">
+            <p className="max-w-3xl text-sm text-muted">
+              Track record on a real company: Nortech Systems, a US electronics manufacturer with one bank and no private equity
+              owner. We replayed its public filings quarter by quarter and compared NorthStar&apos;s forecast with what the
+              company later reported to the SEC.
+            </p>
+            <Backtest />
+          </div>
         )}
         {tab === "benchmark" && <Benchmark />}
       </main>

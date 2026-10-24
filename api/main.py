@@ -2,11 +2,16 @@ import json
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, UploadFile
+import logging
+import time
+
+import openai
+from fastapi import FastAPI, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from api.cases import DATA, load_case
+from api.cases import DATA, UPLOADS, load_case
 from api.copilot import ask
 from api.engine.headroom import Analysis, analyze
 from api.explain import make_insights
@@ -14,16 +19,29 @@ from api.extract_agreement import extract_covenants
 from api.locate import html_to_text
 from api.market import market_context
 from api.models import CovenantSet, Quarter, Scenario
+from api.extract_financials import map_lines
+from api.llm import PRIMARY_MODEL, SECOND_MODEL
+from api.upload import build_quarters, read_sheet, save_case, slug
 
 ROOT = Path(__file__).resolve().parent.parent
 BOFA_LAST_TEST = "2025-12-31"
+RETRY_PAUSE_S = 3
 MODEL_SERVICE ="Open model on Nebius Token Factory (deployable in your own environment)"
 CACHE = DATA / "cache"
 OUTBOUND_LOG = CACHE / "outbound_log.json"
 
+log = logging.getLogger("uvicorn.error")
 app = FastAPI(title="NorthStar")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
                    allow_methods=["*"], allow_headers=["*"])
+
+
+@app.exception_handler(openai.APIError)
+def model_service_error(_, e: openai.APIError):
+    # handled here (inside CORS middleware) so the browser sees the message, not a CORS failure
+    log.warning("model service error: %r", e)
+    return JSONResponse(status_code=502, content={
+        "detail": "The open model service (Nebius Token Factory) is temporarily unavailable. Try again in a moment."})
 
 
 DEFINITIONS = {
@@ -51,6 +69,19 @@ def _case(name: str):
         return load_case(name)
     except KeyError:
         raise HTTPException(404, f"unknown case {name}")
+
+
+def with_fallback(fn, *args, **kw):
+    """App calls only (not the benchmark): if the primary open model errors or returns nothing, alternate with the
+    second one. Token Factory 503s come in bursts of ~20 s, so pause between rounds."""
+    for i, model in enumerate([PRIMARY_MODEL, SECOND_MODEL, PRIMARY_MODEL, SECOND_MODEL]):
+        try:
+            return fn(*args, model=model, **kw)
+        except (openai.APIError, ValueError) as e:
+            log.warning("%s failed on %s (attempt %d): %r", getattr(fn, "__name__", fn), model, i + 1, e)
+            if i == 3:
+                raise
+            time.sleep(RETRY_PAUSE_S)
 
 
 def insight_payload(a: Analysis, meta: dict, sc: Scenario) -> dict:
@@ -101,7 +132,7 @@ def post_analyze(req: AnalyzeRequest):
             insights, cached = json.loads(path.read_text(encoding="utf-8")), True
         else:
             log_outbound(MODEL_SERVICE, "insight cards from the analysis summary")
-            insights = [i.model_dump() for i in make_insights(insight_payload(a, meta, req.scenario))]
+            insights = [i.model_dump() for i in with_fallback(make_insights, insight_payload(a, meta, req.scenario))]
             if is_default:
                 CACHE.mkdir(parents=True, exist_ok=True)
                 path.write_text(json.dumps(insights, indent=1), encoding="utf-8")
@@ -117,10 +148,44 @@ async def post_agreement(file: UploadFile):
     text = html_to_text(raw) if name.endswith((".htm", ".html")) else raw
     log_outbound(MODEL_SERVICE, f"covenant extraction from {file.filename}")
     try:
-        cs, stats = extract_covenants(text)
+        cs, stats = with_fallback(extract_covenants, text)
     except ValueError as e:
         raise HTTPException(422, str(e))
     return {"covenants": cs, "stats": stats.__dict__}
+
+
+@app.post("/company")
+async def post_company(agreement: UploadFile, financials: UploadFile, name: str = Form(...), sector: str = Form(""),
+                       country: str = Form(""), lender: str = Form(""), currency: str = Form("$"),
+                       unit: str = Form("thousands")):
+    """Upload a credit agreement and management accounts; both are read by the open model and saved as a case."""
+    a_name, f_name = (agreement.filename or "").lower(), (financials.filename or "").lower()
+    if not a_name.endswith((".txt", ".htm", ".html")):
+        raise HTTPException(415, "upload the credit agreement as .htm or .txt")
+    if not f_name.endswith(".xlsx"):
+        raise HTTPException(415, "upload the management accounts as .xlsx")
+    raw = (await agreement.read()).decode("utf-8", errors="replace")
+    text = html_to_text(raw) if a_name.endswith((".htm", ".html")) else raw
+    data = await financials.read()
+    log_outbound(MODEL_SERVICE, f"covenant extraction from {agreement.filename}")
+    log_outbound(MODEL_SERVICE, f"account line names from {financials.filename} (names only, no amounts)")
+    try:
+        cols, lines = read_sheet(data)
+        cs, a_stats = with_fallback(extract_covenants, text)
+        mapping, f_stats = with_fallback(map_lines, [n for n, _ in lines])
+        qs = build_quarters(cols, lines, mapping, unit)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    case = slug(name)
+    meta = {"name": case, "display_name": name.strip(), "currency": currency, "unit": "m", "sector": sector,
+            "country": country, "lender": lender, "base_rate": cs.facility.base_rate_name or "",
+            "description": f"Uploaded {datetime.now():%d %b %Y}: {agreement.filename} and {financials.filename}, "
+                           f"{len(qs)} quarters to {qs[-1].period_end:%b %Y}."}
+    save_case(UPLOADS, case, qs, cs, meta, mapping)
+    for stale in (CACHE / f"{case}_insights.json", CACHE / f"market_{case}.json"):
+        stale.unlink(missing_ok=True)
+    return {"case": case, "covenants": cs, "mapping": mapping, "quarters": len(qs),
+            "stats": {"agreement": a_stats.__dict__, "financials": f_stats.__dict__}}
 
 
 def backtest_rows() -> list[dict]:
@@ -165,7 +230,7 @@ class AskRequest(BaseModel):
 def post_ask(req: AskRequest):
     _case(req.case)
     log_outbound(MODEL_SERVICE, "copilot question with engine tool results")
-    return ask(req.case, req.question, req.covenants)
+    return with_fallback(ask, req.case, req.question, req.covenants)
 
 
 @app.get("/market/{name}")

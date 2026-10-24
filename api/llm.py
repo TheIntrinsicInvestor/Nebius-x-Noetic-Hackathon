@@ -29,7 +29,7 @@ class CallStats:
 
 
 def _client() -> OpenAI:
-    return OpenAI(base_url=BASE_URL, api_key=os.environ["NEBIUS_API_KEY"])
+    return OpenAI(base_url=BASE_URL, api_key=os.environ["NEBIUS_API_KEY"], max_retries=4)
 
 
 def list_models() -> list[str]:

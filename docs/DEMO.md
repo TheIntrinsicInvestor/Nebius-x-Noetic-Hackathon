@@ -36,7 +36,8 @@ Every number below was produced by the running code today (24 Oct 2026) or quote
 **6. Why open, and close (20 s).** Loan terms and unaudited numbers are the most sensitive data a company has. Open weights can run inside the company's own environment (Token Factory dedicated endpoints, or self-hosted), and they are cheap enough for firms that will never buy Kyriba. Web searches only carry public metadata; the outbound log proves it. Channel: accountants and fractional finance directors who already look after many of these firms.
 
 ## Honest caveats (have answers ready)
-- Our EBITDA is GAAP from SEC filings; banks add back items, so our ratios can be harsher than the bank's. The backtest flags the trend, not the bank's exact number.
+- Our EBITDA is GAAP from SEC filings; banks add back items, so our ratios can be harsher than the bank's. The backtest flags the trend, not the bank's exact number. Example if asked: our minimum-EBITDA test says breach at Q3 2025 (filing: complied) and pass at Q4 2025 (10-K: waived default). Add-backs and a non-LTM measurement period in the amendments explain it; leverage is the covenant we call correctly.
+- The what-if panel's sliders are customers-pay-later, EBITDA change, extra capex and rates. Revenue was removed from the UI because a one-quarter working-capital swing made it move breaches the "wrong" way on screen.
 - Benchmark labels (`bench/labels.csv`) were drafted from the source text by the build agent. A teammate MUST check them against `bench/prompts/*.txt` before the pitch (16 rows, about 10 minutes). Claude cost is estimated from characters; Claude ran inside Claude Code, so its speed is not comparable.
 - The hosted demo sends analysis summaries to Nebius Token Factory. The privacy claim is "deployable privately", not "never leaves".
 - Closed models can also be private (Claude on Bedrock offers zero data retention). Our case for open is cost and control, shown by the benchmark.

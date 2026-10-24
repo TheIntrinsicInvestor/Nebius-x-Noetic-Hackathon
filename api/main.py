@@ -158,13 +158,14 @@ def get_benchmark():
 class AskRequest(BaseModel):
     case: str
     question: str
+    covenants: CovenantSet | None = None
 
 
 @app.post("/ask")
 def post_ask(req: AskRequest):
     _case(req.case)
     log_outbound(MODEL_SERVICE, "copilot question with engine tool results")
-    return ask(req.case, req.question)
+    return ask(req.case, req.question, req.covenants)
 
 
 @app.get("/market/{name}")

@@ -26,7 +26,7 @@ export default function WhatIf({ scenario, onChange, base, live, busy, currency 
 }) {
   const sliders: SliderDef[] = [
     { key: "dso_delta", label: "Customers pay later (days)", min: 0, max: 60, step: 1, scale: 1, fmt: (v) => `+${v} days` },
-    { key: "revenue_pct", label: "Revenue change", min: -30, max: 10, step: 1, scale: 0.01, fmt: (v) => `${v > 0 ? "+" : ""}${v}%` },
+    { key: "ebitda_pct", label: "EBITDA change", min: -30, max: 10, step: 1, scale: 0.01, fmt: (v) => `${v > 0 ? "+" : ""}${v}%` },
     { key: "capex_extra", label: "Extra capex / R&D (over next 4 quarters)", min: 0, max: 5, step: 0.25, scale: 1, fmt: (v) => `${currency}${v.toFixed(2)}m` },
     { key: "rate_bp", label: "Interest rate change", min: 0, max: 300, step: 25, scale: 1, fmt: (v) => `+${v}bp` },
   ];

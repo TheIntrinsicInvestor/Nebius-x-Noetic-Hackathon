@@ -20,6 +20,22 @@ Rules:
 - facility: total commitment amount, maturity date, interest margin in percent, base rate name, each with a source_quote."""
 
 
+def to_millions(cs: CovenantSet) -> CovenantSet:
+    """Agreements state amounts in full currency units; the engine works in millions. Ratios are left alone."""
+    cs = cs.model_copy(deep=True)
+
+    def m(v: float | None) -> float | None:
+        return v / 1e6 if v is not None and abs(v) > 1e4 else v
+
+    for c in cs.covenants:
+        if c.kind == "min_ebitda":
+            c.threshold = m(c.threshold)
+            for s in c.step_downs:
+                s.threshold = m(s.threshold)
+    cs.facility.size = m(cs.facility.size)
+    return cs
+
+
 def build_prompt(chunks: list[Chunk]) -> tuple[str, str]:
     body = "\n\n".join(f"### {c.title}\n{c.text}" for c in chunks)
     return SYSTEM, f"Credit agreement excerpts:\n\n{body}"
@@ -31,4 +47,4 @@ def extract_covenants(text: str, model: str = PRIMARY_MODEL) -> tuple[CovenantSe
         raise ValueError("no covenant section found in document")
     system, user = build_prompt(chunks)
     data, stats = chat_json(model, system, user, CovenantSet.model_json_schema(), "covenant_set")
-    return CovenantSet.model_validate(data), stats
+    return to_millions(CovenantSet.model_validate(data)), stats

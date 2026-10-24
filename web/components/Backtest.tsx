@@ -18,7 +18,7 @@ export default function Backtest() {
   }, []);
 
   return (
-    <Card title="Backtest: would NorthStar have seen it coming?" aside="Each row uses only the filings available at that date">
+    <Card title="Backtest: would NorthStar have seen it coming?" aside="Each row forecasts from the quarters up to that date (latest filed figures)">
       <ErrorNote message={error} />
       {!rows && !error && <p className="text-sm text-muted"><Spinner /> Replaying past quarters...</p>}
       {rows && (
@@ -57,7 +57,7 @@ export default function Backtest() {
                       ) : "-"}
                     </td>
                     <td className={`py-2 ${pb ? "font-semibold text-breach" : "text-muted"}`}>
-                      {pb ? `${quarterLabel(pb.period_end)} (${kindShort(pb.kind)})` : "No breach in next 6 quarters"}
+                      {pb ? `${quarterLabel(pb.period_end)} (${kindShort(pb.kind)})` : "No breach in next 4 quarters"}
                     </td>
                     <td className="py-2">
                       <Outcome v={r.actual_in_compliance} />

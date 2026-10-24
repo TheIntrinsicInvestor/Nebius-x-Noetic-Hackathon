@@ -46,7 +46,7 @@ export default function Benchmark() {
       <div>
         {title && <h2 className="text-2xl font-semibold tracking-tight text-accent">{title}</h2>}
         <p className="mt-1 max-w-3xl text-sm text-muted">
-          Same prompt, same excerpts, scored against hand-labelled answers.
+          Same prompt, same excerpts, scored against labels drawn verbatim from the source text.
         </p>
       </div>
       <ErrorNote message={error} />

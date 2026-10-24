@@ -32,17 +32,22 @@ class Analysis(BaseModel):
     forecast: list[Quarter]
 
 
+def _needs_input(cov) -> bool:
+    """A missing or non-positive limit can't be tested (and would divide by zero)."""
+    return cov.threshold is None or cov.threshold <= 0
+
+
 def _points(history: list[Quarter], cs: CovenantSet, sc: Scenario, n: int):
     forecast = project(history, n, sc)
     series = history + forecast
     points: list[CovenantPoint] = []
     for cov in cs.covenants:
-        if cov.threshold is None:
+        if _needs_input(cov):
             continue
         for i in range(cov.measurement_quarters - 1, len(series)):
             d = series[i].period_end
             thr = threshold_at(cov, d)
-            if thr is None:
+            if thr is None or thr <= 0:
                 continue
             v = metric_value(cov, series, i)
             h = headroom_pct(cov, v, thr)
@@ -89,7 +94,8 @@ def _reverse_stress(history, cs, sc, n) -> dict[str, float]:
             else:
                 lo = mid
         days = lo
-    return {"ebitda_fall_pct": round(fall, 4), "dso_days": round(days, 1)}
+    # room left from where the scenario already is, not from the base case
+    return {"ebitda_fall_pct": round(fall - sc.ebitda_pct, 4), "dso_days": round(days - sc.dso_delta, 1)}
 
 
 def analyze(history: list[Quarter], cs: CovenantSet, sc: Scenario = Scenario(), n: int = 6,
@@ -102,7 +108,7 @@ def analyze(history: list[Quarter], cs: CovenantSet, sc: Scenario = Scenario(), 
         points=points,
         first_breach=breached[0] if breached else None,
         binding_kind=binding,
-        needs_input=[c.kind for c in cs.covenants if c.threshold is None],
+        needs_input=[c.kind for c in cs.covenants if _needs_input(c)],
         reverse_stress=_reverse_stress(history, cs, sc, n),
         refi=refi_summary(cs.facility, as_of or history[-1].period_end, history[-1].debt),
         forecast=forecast,

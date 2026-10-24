@@ -75,7 +75,7 @@ export default function Dashboard(p: DashboardProps) {
         </div>
       </div>
       <Insights insights={p.insights} loading={p.insightsLoading} error={p.insightsError} onRefresh={p.onRefreshInsights} />
-      <Ask key={caseData.meta.name} caseName={caseData.meta.name} currency={cur} />
+      <Ask key={caseData.meta.name} caseName={caseData.meta.name} currency={cur} covenants={covenants} />
       {isNortech && <div id="backtest" className="scroll-mt-4"><Backtest /></div>}
     </div>
   );

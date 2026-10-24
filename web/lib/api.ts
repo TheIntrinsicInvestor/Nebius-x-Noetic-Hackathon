@@ -7,6 +7,7 @@ import type {
   BenchmarkResponse,
   CaseData,
   CaseName,
+  CovenantSet,
   MarketResponse,
   OutboundCall,
 } from "./types";
@@ -65,11 +66,11 @@ export function getBenchmark(): Promise<BenchmarkResponse> {
   return request<BenchmarkResponse>("/benchmark");
 }
 
-export function ask(caseName: string, question: string): Promise<AskResponse> {
+export function ask(caseName: string, question: string, covenants: CovenantSet): Promise<AskResponse> {
   return request<AskResponse>("/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ case: caseName, question }),
+    body: JSON.stringify({ case: caseName, question, covenants }),
   });
 }
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ask, errorMessage } from "@/lib/api";
 import { seconds, usd } from "@/lib/format";
-import type { AskResponse, ToolCall } from "@/lib/types";
+import type { AskResponse, CovenantSet, ToolCall } from "@/lib/types";
 import { Card, ErrorNote, Spinner } from "./ui";
 
 const signed = (v: number, s: string) => `${v > 0 ? "+" : ""}${s}`;
@@ -38,7 +38,7 @@ function describeCalls(calls: ToolCall[], cur: string): string {
   return bits.join(" and ");
 }
 
-export default function Ask({ caseName, currency }: { caseName: string; currency: string }) {
+export default function Ask({ caseName, currency, covenants }: { caseName: string; currency: string; covenants: CovenantSet }) {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState<AskResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +58,7 @@ export default function Ask({ caseName, currency }: { caseName: string; currency
     setError(null);
     setResult(null);
     try {
-      setResult(await ask(caseName, text));
+      setResult(await ask(caseName, text, covenants));
     } catch (e) {
       setError(errorMessage(e));
     } finally {

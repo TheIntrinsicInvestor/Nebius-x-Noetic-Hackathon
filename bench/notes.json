@@ -1,5 +1,5 @@
 [
-  "Same prompt and the same located excerpts for every model; 16 covenants across 9 real SEC documents, scored against hand labels drawn from the source text.",
+  "Same prompt and the same located excerpts for every model; 16 covenants across 9 real SEC documents, scored against labels drawn verbatim from the source text.",
   "Where open fell short: on FMC's redlined amendment (old and new covenant levels merged into one table, excluded from scoring because the right answer is ambiguous), DeepSeek V4.1 Flash returned an empty response twice; MiniMax listed every quarter's level verbatim; Claude produced the cleanest reading.",
   "Claude cost is an estimate (characters / 4 at $4 / $20 per million tokens for Claude Opus 5.5, excluding thinking tokens, so it is a floor). Claude ran through Claude Code, so its speed is not comparable and is not shown.",
   "Messy management accounts: both open models mapped 19 of 19 bookkeeper line names (e.g. \"Dep'n plant & machinery\", \"Debtors control\") to the right category in under 2 seconds."

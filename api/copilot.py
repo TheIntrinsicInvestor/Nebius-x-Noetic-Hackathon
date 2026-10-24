@@ -6,15 +6,16 @@ from api.cases import load_case
 from api.engine.headroom import analyze
 from api.explain import allowed_numbers, validate_numbers
 from api.llm import PRIMARY_MODEL, PRICES, _client
-from api.models import Scenario
+from api.models import CovenantSet, Scenario
 
 
 def _quarter(d) -> str:
     return f"Q{(d.month - 1) // 3 + 1} {d.year}"
 
 
-def run_scenario_tool(case: str, args: dict) -> dict:
+def run_scenario_tool(case: str, args: dict, covenants: CovenantSet | None = None) -> dict:
     qs, cs, meta = load_case(case)
+    cs = covenants or cs  # thresholds edited on Review or applied from an upload
     sc = Scenario(**{k: float(v) for k, v in args.items() if k in Scenario.model_fields})
     a = analyze(qs, cs, sc)
     lows = {}
@@ -58,7 +59,7 @@ the question. Say clearly whether the plan breaches a covenant and when, and sug
 (you may call run_scenario again to test it). No em dashes."""
 
 
-def ask(case: str, question: str, model: str = PRIMARY_MODEL) -> dict:
+def ask(case: str, question: str, covenants: CovenantSet | None = None, model: str = PRIMARY_MODEL) -> dict:
     client = _client()
     messages = [{"role": "system", "content": SYSTEM}, {"role": "user", "content": question}]
     calls, results, tokens_in, tokens_out = [], [], 0, 0
@@ -80,7 +81,7 @@ def ask(case: str, question: str, model: str = PRIMARY_MODEL) -> dict:
                          "tool_calls": [tc.model_dump() for tc in msg.tool_calls]})
         for tc in msg.tool_calls:
             args = json.loads(tc.function.arguments or "{}")
-            result = run_scenario_tool(case, args)
+            result = run_scenario_tool(case, args, covenants)
             calls.append({"name": tc.function.name, "args": args})
             results.append(result)
             messages.append({"role": "tool", "tool_call_id": tc.id, "content": json.dumps(result)})

@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ask, errorMessage } from "@/lib/api";
 import { seconds, usd } from "@/lib/format";
 import type { AskResponse, CovenantSet, ToolCall } from "@/lib/types";
-import { Card, ErrorNote, Spinner } from "./ui";
+import { ErrorNote, Spinner } from "./ui";
 
 const signed = (v: number, s: string) => `${v > 0 ? "+" : ""}${s}`;
 
@@ -38,11 +38,16 @@ function describeCalls(calls: ToolCall[], cur: string): string {
   return bits.join(" and ");
 }
 
+type Turn = { q: string; result?: AskResponse; error?: string };
+
+// Floating chat panel. Each question is sent on its own: the API keeps no conversation memory.
 export default function Ask({ caseName, currency, covenants }: { caseName: string; currency: string; covenants: CovenantSet }) {
+  const [open, setOpen] = useState(false);
   const [question, setQuestion] = useState("");
-  const [result, setResult] = useState<AskResponse | null>(null);
+  const [turns, setTurns] = useState<Turn[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const suggestions = [
     `We want to spend an extra ${currency}2m on R&D and machinery next year. Can we afford it?`,
@@ -50,78 +55,133 @@ export default function Ask({ caseName, currency, covenants }: { caseName: strin
     "What if interest rates rise by 1%?",
   ];
 
+  useEffect(() => {
+    if (!open) return;
+    inputRef.current?.focus();
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth" }); }, [turns, loading]);
+
   async function submit(q: string) {
     const text = q.trim();
     if (!text || loading) return;
-    setQuestion(text);
+    setQuestion("");
+    setTurns((t) => [...t, { q: text }]);
     setLoading(true);
-    setError(null);
-    setResult(null);
+    let done: Partial<Turn>;
     try {
-      setResult(await ask(caseName, text, covenants));
+      done = { result: await ask(caseName, text, covenants) };
     } catch (e) {
-      setError(errorMessage(e));
-    } finally {
-      setLoading(false);
+      done = { error: errorMessage(e) };
     }
+    setTurns((t) => t.map((turn, i) => (i === t.length - 1 ? { ...turn, ...done } : turn)));
+    setLoading(false);
   }
 
-  const checked = result
-    ? `Checked against the engine: ${describeCalls(result.tool_calls, currency) || "no engine runs"} in ${seconds(result.latency_s)} for ${usd(result.cost_usd)}`
-    : "";
-
   return (
-    <Card title="Ask NorthStar" aside="An open model answers, the covenant engine does the maths">
-      <form
-        onSubmit={(e) => { e.preventDefault(); submit(question); }}
-        className="flex gap-2"
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        aria-label="Open Ask NorthStar"
+        className={`fixed right-0 top-1/2 z-40 flex -translate-y-1/2 flex-col items-center gap-2 rounded-l-xl border-l-[3px] border-teal bg-navy px-2 py-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition hover:pr-3 ${open ? "pointer-events-none opacity-0" : "opacity-100"}`}
       >
-        <input
-          value={question}
-          onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Ask a what-if question about this company's covenants"
-          className="min-w-0 flex-1 rounded-md border border-line bg-surface px-3 py-2 text-sm outline-none focus:border-accent"
-        />
-        <button
-          type="submit"
-          disabled={loading || !question.trim()}
-          className="rounded-md bg-accent px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
-        >
-          Ask
-        </button>
-      </form>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {suggestions.map((s) => (
-          <button
-            key={s}
-            onClick={() => submit(s)}
-            disabled={loading}
-            className="rounded-full border border-line bg-canvas px-3 py-1 text-xs text-ink hover:border-accent hover:text-accent disabled:opacity-50"
-          >
-            {s}
-          </button>
-        ))}
-      </div>
-      <div className="mt-3"><ErrorNote message={error} /></div>
-      {loading && (
-        <p className="mt-3 flex items-center gap-2 text-sm text-muted"><Spinner /> Running scenarios through the engine...</p>
-      )}
-      {result && (
-        <div className="mt-3 rounded-md border border-line border-l-4 border-l-accent p-3">
-          {result.unverified_numbers.length > 0 && (
-            <span
-              className="mb-2 inline-block rounded bg-warn-soft px-1.5 py-0.5 text-xs font-semibold text-warn"
-              title={`Not found in engine output: ${result.unverified_numbers.join(", ")}`}
-            >
-              Some numbers could not be verified
-            </span>
-          )}
-          <div className="space-y-2 text-sm leading-relaxed">
-            {result.answer.split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}
+        <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-full bg-sky text-navy">
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><path d="M12 2l2.4 7.6H22l-6.2 4.6 2.4 7.6L12 17.2l-6.2 4.6 2.4-7.6L2 9.6h7.6z" /></svg>
+        </span>
+        <span className="[writing-mode:vertical-rl] rotate-180 tracking-wide">Ask NorthStar</span>
+      </button>
+
+      <aside
+        aria-label="Ask NorthStar"
+        aria-hidden={!open}
+        className={`fixed right-0 top-0 z-50 flex h-full w-[420px] max-w-full flex-col border-l border-line bg-surface shadow-2xl transition-transform duration-300 ease-out ${open ? "translate-x-0" : "translate-x-full"}`}
+      >
+        <header className="border-t-[3px] border-teal bg-navy px-5 py-4 text-paper">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <h2 className="font-serif text-xl font-semibold text-white">Ask NorthStar</h2>
+              <p className="mt-0.5 text-xs text-paper/70">An open model answers, the covenant engine does the maths.</p>
+            </div>
+            <button onClick={() => setOpen(false)} aria-label="Close" className="rounded p-1 text-paper/70 hover:bg-white/10 hover:text-white">
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6L6 18" /></svg>
+            </button>
           </div>
-          <p className="mt-2 text-xs text-faint num">{checked}</p>
+        </header>
+
+        <div className="flex-1 space-y-4 overflow-y-auto bg-canvas px-4 py-4">
+          {turns.length === 0 && (
+            <div className="space-y-2">
+              <p className="text-sm text-muted">Ask a what-if question about this company&apos;s covenants. Try:</p>
+              {suggestions.map((s) => (
+                <button
+                  key={s}
+                  onClick={() => submit(s)}
+                  disabled={loading}
+                  className="block w-full rounded-lg border border-line bg-surface px-3 py-2 text-left text-sm text-ink hover:border-teal hover:bg-teal-soft disabled:opacity-50"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          )}
+          {turns.map((t, i) => (
+            <div key={i} className="space-y-2">
+              <div className="ml-10 rounded-2xl rounded-br-sm bg-navy px-3.5 py-2 text-sm text-white">{t.q}</div>
+              {t.error && <div className="mr-6"><ErrorNote message={t.error} /></div>}
+              {t.result && <Answer result={t.result} currency={currency} />}
+            </div>
+          ))}
+          {loading && (
+            <p className="mr-6 flex items-center gap-2 rounded-2xl rounded-bl-sm bg-surface px-3.5 py-2 text-sm text-muted">
+              <Spinner /> Running scenarios through the engine...
+            </p>
+          )}
+          <div ref={endRef} />
         </div>
+
+        <form onSubmit={(e) => { e.preventDefault(); submit(question); }} className="border-t border-line bg-surface p-3">
+          <div className="flex gap-2">
+            <input
+              ref={inputRef}
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask about this company's covenants"
+              className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-sm outline-none focus:border-teal"
+            />
+            <button
+              type="submit"
+              disabled={loading || !question.trim()}
+              className="rounded-full bg-navy px-4 py-2 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50"
+            >
+              Ask
+            </button>
+          </div>
+          <p className="mt-1.5 px-1 text-[11px] text-faint">Each question is answered on its own; it does not remember earlier ones.</p>
+        </form>
+      </aside>
+    </>
+  );
+}
+
+function Answer({ result, currency }: { result: AskResponse; currency: string }) {
+  const checked = `Checked against the engine: ${describeCalls(result.tool_calls, currency) || "no engine runs"} in ${seconds(result.latency_s)} for ${usd(result.cost_usd)}`;
+  return (
+    <div className="mr-6 rounded-2xl rounded-bl-sm border border-line border-l-4 border-l-teal bg-surface p-3">
+      {result.unverified_numbers.length > 0 && (
+        <span
+          className="mb-2 inline-block rounded bg-warn-soft px-1.5 py-0.5 text-xs font-semibold text-warn"
+          title={`Not found in engine output: ${result.unverified_numbers.join(", ")}`}
+        >
+          Some numbers could not be verified
+        </span>
       )}
-    </Card>
+      <div className="space-y-2 text-sm leading-relaxed">
+        {result.answer.split(/\n{2,}/).map((para, i) => <p key={i}>{para}</p>)}
+      </div>
+      <p className="mt-2 text-xs text-faint num">{checked}</p>
+    </div>
   );
 }

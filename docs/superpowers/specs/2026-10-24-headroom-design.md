@@ -1,4 +1,4 @@
-# Headroom: design spec (2026-10-24)
+# NorthStar (working name Headroom): design spec (2026-10-24)
 
 Covenant early warning for mid-sized companies without a PE sponsor. Built for the Noetic x Nebius hackathon (judging 16:30 today). Full research and sources: the hackathon folder's plan file (`C:\Users\Brian\.claude\plans\pasted-content-id-6c20-the-story-agile-bachman.md`).
 

@@ -20,7 +20,7 @@ MODEL_SERVICE = "Open model on Nebius Token Factory (deployable in your own envi
 CACHE = DATA / "cache"
 OUTBOUND_LOG = CACHE / "outbound_log.json"
 
-app = FastAPI(title="Headroom")
+app = FastAPI(title="NorthStar")
 app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
                    allow_methods=["*"], allow_headers=["*"])
 

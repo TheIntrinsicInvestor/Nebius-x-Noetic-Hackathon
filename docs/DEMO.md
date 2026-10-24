@@ -1,11 +1,11 @@
-# Headroom: demo script and pitch numbers
+# NorthStar: demo script and pitch numbers
 
 Every number below was produced by the running code today (24 Oct 2026) or quoted from a filing. Sources are in brackets.
 
 ## Run it
 1. API: `C:\Users\Brian\.venvs\headroom\Scripts\python -m uvicorn api.main:app --port 8000` (from `C:\Users\Brian\code\headroom`)
 2. Web: `npm run dev` in `web\`, open http://localhost:3000
-3. Insights and market context are cached in `data\cache\`, so the demo does not wait on the models. Upload and "Ask Headroom" run live (2 to 15 s).
+3. Insights and market context are cached in `data\cache\`, so the demo does not wait on the models. Upload and "Ask NorthStar" run live (2 to 15 s).
 
 ## 3-minute story
 **1. Hook (20 s).** "Nortech Systems is a mid-sized US electronics manufacturer: about $120m revenue, one bank, no private equity owner. In under two years its covenants were amended four times. It breached anyway, twice. It never missed a payment."
@@ -15,14 +15,14 @@ Every number below was produced by the running code today (24 Oct 2026) or quote
 
 **3. Demo: rewind Nortech to 30 Sep 2024 (60 s).**
 - Load Nortech. Today is 30 Sep 2024. Leverage is 1.74x against a 2.50x limit: 30% headroom. Looks fine.
-- Headroom forecasts a leverage breach in Q1 2025 (2.64x).
-- Backtest table: Nortech actually breached at the very next test (Q4 2024) and again in Q1 2025. With 30% headroom on paper, Headroom was already warning of a breach within two quarters, from public numbers alone. (Say it this way: our forecast date was Q1 2025, the real first breach came one quarter sooner.)
+- NorthStar forecasts a leverage breach in Q1 2025 (2.64x).
+- Backtest table: Nortech actually breached at the very next test (Q4 2024) and again in Q1 2025. With 30% headroom on paper, NorthStar was already warning of a breach within two quarters, from public numbers alone. (Say it this way: our forecast date was Q1 2025, the real first breach came one quarter sooner.)
 - The covenants were read straight from the real credit agreement by an open model, with the clause quoted next to each number.
 
 **4. Demo: a UK family firm (45 s).** Load Ashby & Rowe Engineering (fictional).
-- Leverage 2.55x against 3.00x: fine. But the limit steps down to 2.50x in March 2027. Headroom: customers can pay only 6 days later before a breach.
+- Leverage 2.55x against 3.00x: fine. But the limit steps down to 2.50x in March 2027. NorthStar's stress test: customers can pay only 6 days later before a breach.
 - Move the "customers pay later" slider to 10 days: breach in Q1 2027.
-- Ask Headroom: "We want to spend an extra £2m on R&D and machinery next year. Can we afford it?" Answer: £2m breaches leverage in Q1 2027 (2.57x); £1m passes (2.47x, thin headroom). The model ran the engine three times in about 1.5 s for a tenth of a cent. Every number comes from the engine, not the model.
+- Ask NorthStar: "We want to spend an extra £2m on R&D and machinery next year. Can we afford it?" Answer: £2m breaches leverage in Q1 2027 (2.57x); £1m passes (2.47x, thin headroom). The model ran the engine three times in about 1.5 s for a tenth of a cent. Every number comes from the engine, not the model.
 - Messy books: both open models mapped 19 of 19 bookkeeper line names ("Dep'n plant & machinery", "Debtors control") correctly.
 
 **5. Open vs closed (30 s).** 16 covenants in 9 real SEC credit documents, same prompt and excerpts for every model:

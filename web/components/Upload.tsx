@@ -10,7 +10,7 @@ const CASES: { name: CaseName; title: string; sub: string }[] = [
   {
     name: "nortech",
     title: "Load Nortech Systems (real SEC filings)",
-    sub: "US contract manufacturer with a $15m revolver. Breached a covenant in 2025 and needed a waiver from its bank.",
+    sub: "US contract manufacturer with a $15m revolver. Breached its covenants at Dec 2024, Mar 2025 and Dec 2025, each time needing a bank waiver.",
   },
   {
     name: "sample_uk",

@@ -6,10 +6,32 @@ import { comparatorLabel, covValue, kindLabel, modelName, quarterLabel, seconds,
 import type { CaseName, CompanyResponse } from "@/lib/types";
 import { Card, ErrorNote, Spinner } from "./ui";
 
-const SAMPLES: { name: CaseName; label: string }[] = [
-  { name: "nortech", label: "US electronics manufacturer (public filings)" },
-  { name: "sample_uk", label: "UK engineering firm" },
+// Samples replay the upload flow: fields type in, file names drop in, the progress bar plays, then the cached case loads.
+type Sample = {
+  name: CaseName;
+  label: string;
+  fields: { name: string; sector: string; country: string; lender: string; currency: string; unit: string };
+  agreement: string;
+  financials: string;
+  budget?: string;
+};
+
+const SAMPLES: Sample[] = [
+  {
+    name: "nortech", label: "US electronics manufacturer (public filings)",
+    fields: { name: "Nortech Systems Inc.", sector: "electronics manufacturing", country: "United States", lender: "Bank of America", currency: "$", unit: "thousands" },
+    agreement: "credit_agreement_2024-03.htm", financials: "nortech_quarterly_accounts.xlsx",
+  },
+  {
+    name: "sample_uk", label: "UK engineering firm",
+    fields: { name: "Ashby & Rowe Engineering Ltd", sector: "engineering manufacturing", country: "UK", lender: "UK high street banks", currency: "£", unit: "thousands" },
+    agreement: "facility_agreement.txt", financials: "ashby_rowe_management_accounts.xlsx", budget: "ashby_rowe_budget_fy27.xlsx",
+  },
 ];
+
+const PLAY_MS = 8000;
+const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
+const placeholderFile = (n: string) => new File([], n);
 
 const CATEGORY: Record<string, string> = {
   revenue: "Revenue", cogs: "Direct costs", opex: "Overheads", da: "Depreciation", interest: "Interest",
@@ -37,7 +59,47 @@ export default function Upload({ onLoad, loading, error }: {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [result, setResult] = useState<CompanyResponse | null>(null);
 
-  const ready = name.trim() && agreement && financials && !working;
+  const [playing, setPlaying] = useState(false);
+  const busy = working || playing;
+  const ready = name.trim() && agreement && financials && !busy;
+
+  async function typeInto(set: (v: string) => void, text: string) {
+    for (let i = 1; i <= text.length; i++) {
+      set(text.slice(0, i));
+      await wait(28);
+    }
+  }
+
+  async function playSample(s: Sample) {
+    if (busy) return;
+    setPlaying(true);
+    setResult(null);
+    setUploadError(null);
+    [setName, setSector, setCountry, setLender].forEach((f) => f(""));
+    setAgreement(null);
+    setFinancials(null);
+    setBudget(null);
+    setCurrency(s.fields.currency);
+    setUnit(s.fields.unit);
+    await typeInto(setName, s.fields.name);
+    await typeInto(setSector, s.fields.sector);
+    await typeInto(setCountry, s.fields.country);
+    await typeInto(setLender, s.fields.lender);
+    await wait(300);
+    setAgreement(placeholderFile(s.agreement));
+    await wait(350);
+    setFinancials(placeholderFile(s.financials));
+    if (s.budget) {
+      await wait(350);
+      setBudget(placeholderFile(s.budget));
+    }
+    await wait(900);
+    setWorking(true);
+    await wait(PLAY_MS);
+    setWorking(false);
+    setPlaying(false);
+    onLoad(s.name);
+  }
 
   async function analyse() {
     if (!ready) return;
@@ -107,7 +169,7 @@ export default function Upload({ onLoad, loading, error }: {
           >
             {working ? <span className="inline-flex items-center gap-2"><Spinner /> Analysing with an open model...</span> : "Analyse"}
           </button>
-          {working && <Steps hasBudget={!!budget} />}
+          {working && <Steps hasBudget={!!budget} stepMs={playing ? PLAY_MS / 5 : undefined} />}
           <div className="mt-3"><ErrorNote message={uploadError} /></div>
         </Card>
         <p className="text-xs text-muted">
@@ -115,10 +177,9 @@ export default function Upload({ onLoad, loading, error }: {
           {SAMPLES.map((s, i) => (
             <span key={s.name}>
               {i > 0 && " · "}
-              <button onClick={() => onLoad(s.name)} disabled={loading !== null} className="text-accent underline underline-offset-2 disabled:opacity-50">
+              <button onClick={() => playSample(s)} disabled={busy || loading !== null} className="text-accent underline underline-offset-2 disabled:opacity-50">
                 {s.label}
               </button>
-              {loading === s.name && <> <Spinner /></>}
             </span>
           ))}
         </p>
@@ -146,7 +207,7 @@ export default function Upload({ onLoad, loading, error }: {
 // and hold on the last one until the response arrives (the component then unmounts).
 const STEP_MS = 6000;
 
-function Steps({ hasBudget }: { hasBudget: boolean }) {
+function Steps({ hasBudget, stepMs = STEP_MS }: { hasBudget: boolean; stepMs?: number }) {
   const steps = [
     "Locating the covenant section",
     "Extracting covenant terms",
@@ -156,9 +217,9 @@ function Steps({ hasBudget }: { hasBudget: boolean }) {
   ];
   const [step, setStep] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setStep((s) => Math.min(s + 1, steps.length - 1)), STEP_MS);
+    const t = setInterval(() => setStep((s) => Math.min(s + 1, steps.length - 1)), stepMs);
     return () => clearInterval(t);
-  }, [steps.length]);
+  }, [steps.length, stepMs]);
   return (
     <div className="mt-4" aria-live="polite">
       <div className="flex gap-1">
@@ -166,7 +227,7 @@ function Steps({ hasBudget }: { hasBudget: boolean }) {
           <div key={i} className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
             <div
               className={`h-full rounded-full bg-navy transition-[width] ease-linear ${i === step ? "animate-pulse" : ""}`}
-              style={{ width: i < step ? "100%" : i === step ? "60%" : "0%", transitionDuration: i === step ? `${STEP_MS}ms` : "300ms" }}
+              style={{ width: i < step ? "100%" : i === step ? "60%" : "0%", transitionDuration: i === step ? `${stepMs}ms` : "300ms" }}
             />
           </div>
         ))}

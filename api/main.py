@@ -16,7 +16,8 @@ from api.market import market_context
 from api.models import CovenantSet, Quarter, Scenario
 
 ROOT = Path(__file__).resolve().parent.parent
-MODEL_SERVICE = "Open model on Nebius Token Factory (deployable in your own environment)"
+BOFA_LAST_TEST = "2025-12-31"
+MODEL_SERVICE ="Open model on Nebius Token Factory (deployable in your own environment)"
 CACHE = DATA / "cache"
 OUTBOUND_LOG = CACHE / "outbound_log.json"
 
@@ -127,7 +128,8 @@ def backtest_rows() -> list[dict]:
     truth = {r["period_end"]: r for r in json.loads((DATA / "nortech" / "compliance.json").read_text(encoding="utf-8"))}
     rows = []
     for i, q in enumerate(qs):
-        if q.period_end.year < 2024:
+        # BofA covenants applied from 2024 until the Mar 2026 refinancing with Associated Bank
+        if q.period_end.year < 2024 or q.period_end.isoformat() > BOFA_LAST_TEST:
             continue
         a = analyze(qs[: i + 1], cs, n=4)
         t = truth.get(q.period_end.isoformat())

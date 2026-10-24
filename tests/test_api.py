@@ -77,6 +77,11 @@ def test_ask_endpoint_logs_and_returns_answer(monkeypatch):
     assert client.post("/ask", json={"case": "nope", "question": "x"}).status_code == 404
 
 
+def test_backtest_stops_at_last_bofa_test():
+    rows = client.get("/backtest/nortech").json()["rows"]
+    assert rows[-1]["as_of"] == "2025-12-31"  # refinanced with a new lender in Mar 2026
+
+
 def test_backtest_row_explains_suspended_tests():
     rows = client.get("/backtest/nortech").json()["rows"]
     row = next(r for r in rows if r["as_of"] == "2025-09-30")

@@ -1,10 +1,13 @@
 import json
+import os
 from pathlib import Path
 
 from api.models import BudgetQuarter, CovenantSet, Quarter
 
 DATA = Path(__file__).resolve().parent.parent / "data"
-UPLOADS = DATA / "uploads"
+# writable state (uploads, caches): a mounted volume when hosted, data/ locally
+STATE = Path(os.environ.get("HEADROOM_STATE", DATA))
+UPLOADS = STATE / "uploads"
 
 META = {
     "nortech": {"name": "nortech", "display_name": "Nortech Systems Inc.", "currency": "$", "unit": "m",

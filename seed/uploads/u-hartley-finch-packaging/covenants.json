@@ -1,0 +1,52 @@
+{
+ "covenants": [
+  {
+   "kind": "leverage",
+   "comparator": "max",
+   "threshold": 3.25,
+   "step_downs": [
+    {
+     "date": "2026-10-01",
+     "threshold": 2.5
+    }
+   ],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": true,
+   "addbacks": [
+    "Finance Costs",
+    "Exceptional Items",
+    "amortisation of intangible assets",
+    "depreciation of tangible assets"
+   ],
+   "addback_cap_pct": null,
+   "source_quote": "Leverage in respect of any Relevant Period shall not exceed 3.25:1 for each Relevant Period ending on or before 30 September 2026 and 2.50:1 thereafter."
+  },
+  {
+   "kind": "interest_cover",
+   "comparator": "min",
+   "threshold": 3.0,
+   "step_downs": [],
+   "effective_from": null,
+   "test_frequency": "quarterly",
+   "measurement_quarters": 4,
+   "nets_cash": false,
+   "addbacks": [
+    "Finance Costs",
+    "Exceptional Items",
+    "amortisation of intangible assets",
+    "depreciation of tangible assets"
+   ],
+   "addback_cap_pct": null,
+   "source_quote": "Interest Cover in respect of any Relevant Period shall not be less than 3.00:1."
+  }
+ ],
+ "facility": {
+  "size": null,
+  "maturity": "2028-06-30",
+  "margin_pct": 3.25,
+  "base_rate_name": "Compounded Reference Rate (SONIA)",
+  "source_quote": "\"Margin\" means 3.25 per cent. per annum over Compounded Reference Rate (SONIA). \"Termination Date\" means 30 June 2028."
+ }
+}

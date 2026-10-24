@@ -57,6 +57,12 @@ export default function Home() {
     }
   }
 
+  // A shared link can open a company directly: /app?case=u-...
+  useEffect(() => {
+    const name = new URLSearchParams(window.location.search).get("case");
+    if (name) loadCase(name);
+  }, []);
+
   // Base case: re-run whenever the case or covenants change.
   useEffect(() => {
     if (!caseName || !covenants) return;

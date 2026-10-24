@@ -1,0 +1,56 @@
+[
+ {
+  "query": "Compounded Reference Rate (SONIA) interest rate outlook 2026",
+  "answer": "The sources indicate that the 1-Month Compounded SONIA rate and the 3-Month Compounded SONIA rate have shown no change as of 20-Oct-2026, with the 1-Month Compounded SONIA rate at 3.73629% and the 3-Month Compounded SONIA rate at 3.74816%. The latest daily SONIA rate as of 20-Oct-2026 is 3.73350%. The sources do not provide a definitive outlook for the Compounded Reference Rate (SONIA) interest rate for 2026 beyond these figures.",
+  "sources": [
+   {
+    "title": "Europe Market Rates | Chatham Financial",
+    "url": "https://cf.com/rates/europe"
+   },
+   {
+    "title": "SONIA interest rate | global-rates.com",
+    "url": "https://www.global-rates.com/en/interest-rates/sonia"
+   },
+   {
+    "title": "Interest Rates \u2013 2026 SONIA (GBP) INDEX",
+    "url": "https://www.vistabank.ro/public/docs/Reference_indices_JUL26_EN.pdf"
+   }
+  ]
+ },
+ {
+  "query": "UK packaging manufacturing bank lending conditions and refinancing 2026",
+  "answer": "The Bank of England's July 2026 Financial Stability Report indicates that large corporates continue to demand bank loans for working capital and refinancing needs, while SME demand is muted due to economic uncertainty. The State of Asset-Based Lending report suggests a +5% to +10% growth in ABL commitments and a +15% to +25% increase in refinancing volume for 2026. The Commercial Refinance Wall report highlights that UK commercial property owners are facing refinancing challenges due to market valuation pressures and tighter lender risk tolerance, especially for loans originated between 2018 and 2021.",
+  "sources": [
+   {
+    "title": "Financial Stability Report - July 2026 | Bank of England \u2013 the UK's central bank",
+    "url": "https://www.bankofengland.co.uk/financial-stability-report/2026/july-2026"
+   },
+   {
+    "title": "The State of Asset-Based Lending: 2026 Review & 2027 ...",
+    "url": "https://thinkingahead.com/resources/industry-spotlight/the-state-of-asset-based-lending-2026-review-2027-outlook"
+   },
+   {
+    "title": "The Commercial Refinance Wall In 2026: How Landlords Respond",
+    "url": "https://www.willowprivatefinance.co.uk/the-2026-commercial-refinance-wall-bridging-strategies-for-stressed-assets"
+   }
+  ]
+ },
+ {
+  "query": "Calder Bank corporate lending news 2026",
+  "answer": "The sources indicate that in 2026, the commercial lending landscape is characterized by disciplined underwriting standards and greater selectivity in lending. The US C&I loan market stood at approximately USD 2.82 trillion as of March 2026, with banks expecting lending standards to sustain and enhanced demand irrespective of loan categories. The global commercial lending market is projected to value at USD 22 trillion by 2026 and is expected to expand at a 16.2% compound annual growth rate to USD 40.4 trillion by 2030. The primary trends include stabilising lending standards following the tightening cycle of 2025, growing AI adoption in underwriting and portfolio monitoring, rising demand from middle-market and large firms for C&I credit, ongoing regulatory uncertainty tied to US deregulation policy, and accelerating bank M&A activity.",
+  "sources": [
+   {
+    "title": "Calder Capital: Nationwide M&A Activity Q1 2026 - Deals $1-10M+",
+    "url": "https://www.caldergr.com/q1-2026-market-update"
+   },
+   {
+    "title": "Essential corporate and commercial lending trends",
+    "url": "https://www.acuityanalytics.com/blog/corporate-and-commercial-lending-trends"
+   },
+   {
+    "title": "What to Expect in Commercial Lending in 2026: Navigating Higher Standards",
+    "url": "https://www.firstcbt.bank/blog/post/what-to-expect-in-commercial-lending-in-2026-navigating-higher-standards-and-smarter-use-of-capital-"
+   }
+  ]
+ }
+]

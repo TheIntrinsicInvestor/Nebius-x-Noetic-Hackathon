@@ -1,0 +1,56 @@
+[
+ {
+  "query": "SONIA interest rate outlook 2026",
+  "answer": "The sources provide specific rates for the SONIA interest rate for certain dates in 2026. On 10-01-2026, the rate was 3.7331%, and for the period 8 July 2026 - 7 October 2026, the rate was 3.7673%. For the period 8 April 2026 - 7 July 2026, the rate was 3.8390%. The sources do not provide a definitive outlook for the entire year 2026 beyond these specific rates and periods.",
+  "sources": [
+   {
+    "title": "SONIA interest rate | global-rates.com",
+    "url": "https://www.global-rates.com/en/interest-rates/sonia"
+   },
+   {
+    "title": "Interest Rates \u2013 2026 SONIA (GBP) INDEX",
+    "url": "https://www.vistabank.ro/public/docs/Reference_indices_JUL26_EN.pdf"
+   },
+   {
+    "title": "SONIA | Prodigy Finance",
+    "url": "https://prodigyfinance.com/legal/sonia"
+   }
+  ]
+ },
+ {
+  "query": "UK engineering manufacturing bank lending conditions and refinancing 2026",
+  "answer": "The Bank of England's Financial Stability Report from July 2026 indicates that large corporates continue to demand bank loans for working capital and refinancing needs, but borrowing to invest remains subdued. SME demand is muted due to heightened economic uncertainty. Solon reports a refinancing wall for UK facilities coming due together across 2026 and 2027, with windows open for between 15,519 and 16,808 companies each quarter. Willow Private Finance highlights the commercial refinance wall for UK commercial property owners, noting that loans originated between 2018 and 2021 are reaching maturity in a market with tightened lender risk tolerance and a \"higher for longer\" interest rate environment.",
+  "sources": [
+   {
+    "title": "Financial Stability Report - July 2026 | Bank of England \u2013 the UK's central bank",
+    "url": "https://www.bankofengland.co.uk/financial-stability-report/2026/july-2026"
+   },
+   {
+    "title": "The UK refinancing wall, 2026\u20132028 | Solon",
+    "url": "https://soloncorporate.com/guides/uk-refinancing-wall-2026-2028"
+   },
+   {
+    "title": "The Commercial Refinance Wall In 2026: How Landlords Respond",
+    "url": "https://www.willowprivatefinance.co.uk/the-2026-commercial-refinance-wall-bridging-strategies-for-stressed-assets"
+   }
+  ]
+ },
+ {
+  "query": "UK high street banks corporate lending news 2026",
+  "answer": "UK high street banks maintained their position in larger, more complex corporate lending transactions while losing ground in the sub-\u00a3500k market to agile digital lenders, according to Spark Finance's annual review. Barclays continues to offer secured business lending with a full suite of business banking services and high brand recognition, as highlighted by My Market Research Methods. Additionally, SME lending reached its highest level since 2021, with a 51 per cent increase in lending to the smallest businesses year-on-year, according to UK Finance.",
+  "sources": [
+   {
+    "title": "A Year in UK Business Finance: Insights from 2026-2027 | Spark Finance",
+    "url": "https://www.sparkfinance.co.uk/blog/business-finance-annual-review-2027-uk"
+   },
+   {
+    "title": "7 Best Secured Business Loan Providers in the UK (2026) | My Market Research Methods",
+    "url": "https://www.mymarketresearchmethods.com/7-best-secured-business-loan-providers-in-the-uk-2026"
+   },
+   {
+    "title": "SME lending hits post-pandemic high | Insights | UK Finance",
+    "url": "https://www.ukfinance.org.uk/news-and-insight/press-release/sme-lending-hits-post-pandemic-high"
+   }
+  ]
+ }
+]

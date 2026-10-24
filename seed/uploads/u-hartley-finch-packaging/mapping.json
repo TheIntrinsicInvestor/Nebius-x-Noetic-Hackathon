@@ -1,0 +1,92 @@
+[
+ {
+  "name": "Sales - UK retail",
+  "category": "revenue",
+  "confidence": 0.99
+ },
+ {
+  "name": "Sales - food service",
+  "category": "revenue",
+  "confidence": 0.99
+ },
+ {
+  "name": "Board & film purchases",
+  "category": "cogs",
+  "confidence": 0.97
+ },
+ {
+  "name": "Factory wages",
+  "category": "cogs",
+  "confidence": 0.9
+ },
+ {
+  "name": "Office salaries",
+  "category": "opex",
+  "confidence": 0.97
+ },
+ {
+  "name": "Rent - Halifax site",
+  "category": "opex",
+  "confidence": 0.97
+ },
+ {
+  "name": "Utilities",
+  "category": "opex",
+  "confidence": 0.97
+ },
+ {
+  "name": "Depreciation - plant",
+  "category": "da",
+  "confidence": 0.99
+ },
+ {
+  "name": "Loan interest - Calder",
+  "category": "interest",
+  "confidence": 0.99
+ },
+ {
+  "name": "Capital additions",
+  "category": "capex",
+  "confidence": 0.97
+ },
+ {
+  "name": "Term loan repayments",
+  "category": "principal",
+  "confidence": 0.97
+ },
+ {
+  "name": "Trade debtors",
+  "category": "receivables",
+  "confidence": 0.99
+ },
+ {
+  "name": "Stock - board & film",
+  "category": "inventory",
+  "confidence": 0.99
+ },
+ {
+  "name": "Stock - finished",
+  "category": "inventory",
+  "confidence": 0.99
+ },
+ {
+  "name": "Trade creditors",
+  "category": "payables",
+  "confidence": 0.99
+ },
+ {
+  "name": "Bank - current account",
+  "category": "cash",
+  "confidence": 0.97
+ },
+ {
+  "name": "Term loan - Calder",
+  "category": "debt",
+  "confidence": 0.98
+ },
+ {
+  "name": "RCF drawn - Calder",
+  "category": "debt",
+  "confidence": 0.98
+ }
+]

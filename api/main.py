@@ -1,4 +1,6 @@
 import json
+import os
+import shutil
 from datetime import datetime
 from pathlib import Path
 
@@ -6,12 +8,12 @@ import logging
 import time
 
 import openai
-from fastapi import FastAPI, Form, HTTPException, UploadFile
+from fastapi import FastAPI, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from api.cases import DATA, UPLOADS, load_budget, load_case
+from api.cases import DATA, STATE, UPLOADS, load_budget, load_case
 from api.copilot import ask
 from api.engine.headroom import Analysis, analyze
 from api.explain import make_insights
@@ -22,19 +24,35 @@ from api.models import CovenantSet, Quarter, Scenario
 from api.extract_financials import map_lines
 from api.llm import PRIMARY_MODEL, SECOND_MODEL
 from api.pdf import pdf_text
+from api.ratelimit import rate_limit
 from api.upload import build_budget, build_quarters, read_table, save_case, slug
 
 ROOT = Path(__file__).resolve().parent.parent
 BOFA_LAST_TEST = "2025-12-31"
 RETRY_PAUSE_S = 3
 MODEL_SERVICE ="Open model on Nebius Token Factory (deployable in your own environment)"
-CACHE = DATA / "cache"
+CACHE = STATE / "cache"
 OUTBOUND_LOG = CACHE / "outbound_log.json"
+RATE_FILE = STATE / "ratelimit.json"
+# hosted front end origins, comma-separated (e.g. the Vercel URL)
+ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"] + [
+    o.strip() for o in os.environ.get("CORS_ORIGINS", "").split(",") if o.strip()]
+
+
+def seed_state(seed: Path, state: Path) -> None:
+    """A fresh hosted volume starts with the showcase case and its caches (seed/); never overwrites."""
+    for src in seed.rglob("*"):
+        dst = state / src.relative_to(seed)
+        if src.is_file() and not dst.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy(src, dst)
+
+
+seed_state(ROOT / "seed", STATE)
 
 log = logging.getLogger("uvicorn.error")
 app = FastAPI(title="NorthStar")
-app.add_middleware(CORSMiddleware, allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
-                   allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=ORIGINS, allow_methods=["*"], allow_headers=["*"])
 
 
 @app.exception_handler(openai.APIError)
@@ -117,7 +135,7 @@ def get_case(name: str):
 
 
 @app.post("/analyze")
-def post_analyze(req: AnalyzeRequest):
+def post_analyze(req: AnalyzeRequest, request: Request):
     qs, cs, meta = _case(req.case)
     qs = req.quarters if req.quarters is not None else qs
     cs = req.covenants or cs
@@ -132,6 +150,7 @@ def post_analyze(req: AnalyzeRequest):
         if is_default and path.exists():
             insights, cached = json.loads(path.read_text(encoding="utf-8")), True
         else:
+            rate_limit(request, RATE_FILE)
             log_outbound(MODEL_SERVICE, "insight cards from the analysis summary")
             insights = [i.model_dump() for i in with_fallback(make_insights, insight_payload(a, meta, req.scenario))]
             if is_default:
@@ -154,13 +173,14 @@ def agreement_text(filename: str, data: bytes) -> str:
 
 
 @app.post("/agreement")
-async def post_agreement(file: UploadFile):
+async def post_agreement(file: UploadFile, request: Request):
     name = (file.filename or "").lower()
     if not name.endswith(AGREEMENT_TYPES):
         raise HTTPException(415, "upload the credit agreement as .pdf, .htm or .txt")
     data = await file.read()
     try:
         text = agreement_text(name, data)
+        rate_limit(request, RATE_FILE)
         log_outbound(MODEL_SERVICE, f"covenant extraction from {file.filename}")
         cs, stats = with_fallback(extract_covenants, text)
     except ValueError as e:
@@ -169,7 +189,8 @@ async def post_agreement(file: UploadFile):
 
 
 @app.post("/company")
-async def post_company(agreement: UploadFile, financials: UploadFile, budget: UploadFile | None = None,
+async def post_company(request: Request, agreement: UploadFile, financials: UploadFile,
+                       budget: UploadFile | None = None,
                        name: str = Form(...), sector: str = Form(""),
                        country: str = Form(""), lender: str = Form(""), currency: str = Form("$"),
                        unit: str = Form("thousands")):
@@ -190,6 +211,7 @@ async def post_company(agreement: UploadFile, financials: UploadFile, budget: Up
         text = agreement_text(a_name, a_data)
         cols, lines = read_table(data, f_name)
         b_cols, b_lines = read_table(b_data, b_name) if b_data else ([], [])
+        rate_limit(request, RATE_FILE)
         log_outbound(MODEL_SERVICE, f"covenant extraction from {agreement.filename}")
         files = financials.filename + (f" and {budget.filename}" if budget else "")
         log_outbound(MODEL_SERVICE, f"account line names from {files} (names only, no amounts)")
@@ -253,18 +275,20 @@ class AskRequest(BaseModel):
 
 
 @app.post("/ask")
-def post_ask(req: AskRequest):
+def post_ask(req: AskRequest, request: Request):
     _case(req.case)
+    rate_limit(request, RATE_FILE)
     log_outbound(MODEL_SERVICE, "copilot question with engine tool results")
     return with_fallback(ask, req.case, req.question, req.covenants)
 
 
 @app.get("/market/{name}")
-def get_market(name: str):
+def get_market(name: str, request: Request):
     _, _, meta = _case(name)
     path = CACHE / f"market_{name}.json"
     if path.exists():
         return {"items": json.loads(path.read_text(encoding="utf-8")), "cached": True}
+    rate_limit(request, RATE_FILE)
     items = market_context(meta, log_outbound)
     CACHE.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(items, indent=1), encoding="utf-8")

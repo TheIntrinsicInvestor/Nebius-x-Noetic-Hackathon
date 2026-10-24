@@ -1,0 +1,11 @@
+{
+ "name": "u-hartley-finch-packaging",
+ "display_name": "Hartley & Finch Packaging",
+ "currency": "\u00a3",
+ "unit": "m",
+ "sector": "packaging manufacturing",
+ "country": "UK",
+ "lender": "Calder Bank",
+ "base_rate": "Compounded Reference Rate (SONIA)",
+ "description": "Uploaded 24 Oct 2026: facility_agreement.txt and hartley_finch_management_accounts.xlsx, 12 quarters to Sep 2026."
+}

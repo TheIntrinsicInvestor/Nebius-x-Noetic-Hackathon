@@ -1,0 +1,6 @@
+web/
+bench/
+docs/
+tests/
+data/uploads/
+data/cache/

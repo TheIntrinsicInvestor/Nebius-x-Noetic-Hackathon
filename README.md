@@ -81,6 +81,8 @@ Open http://localhost:3000.
 - `TAVILY_API_KEY`: for the market context panel
 - `SEC_USER_AGENT`: a name and contact email, which the SEC requires for its data API
 
+If `~/.secrets/headroom.env` exists it is used instead of `.env`, for keeping keys out of a synced folder.
+
 Tests: `python -m pytest -q` from the repo root, and `npx tsc --noEmit` in `web/`.
 
 ## Try it with real files

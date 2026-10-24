@@ -3,9 +3,9 @@
 import os
 from datetime import date
 
-from dotenv import load_dotenv
+from api.env import load_env
 
-load_dotenv()
+load_env()
 
 
 def market_queries(meta: dict) -> list[str]:

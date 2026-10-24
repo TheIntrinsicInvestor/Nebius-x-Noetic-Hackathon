@@ -3,10 +3,10 @@ import os
 import time
 from dataclasses import dataclass
 
-from dotenv import load_dotenv
+from api.env import load_env
 from openai import OpenAI
 
-load_dotenv()
+load_env()
 
 BASE_URL = "https://api.tokenfactory.nebius.com/v1/"
 PRIMARY_MODEL = "deepseek-ai/DeepSeek-V4.1-Flash-1017"

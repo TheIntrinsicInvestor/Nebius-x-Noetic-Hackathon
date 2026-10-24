@@ -6,11 +6,11 @@ from datetime import date
 from pathlib import Path
 
 import httpx
-from dotenv import load_dotenv
+from api.env import load_env
 
 from api.models import Quarter
 
-load_dotenv()
+load_env()
 log = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent

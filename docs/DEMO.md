@@ -3,7 +3,7 @@
 Every number below was produced by the running code today (24 Oct 2026) or quoted from a filing. Sources are in brackets.
 
 ## Run it
-1. API: `C:\Users\Brian\.venvs\headroom\Scripts\python -m uvicorn api.main:app --port 8000` (from `C:\Users\Brian\code\headroom`)
+1. API: `C:\Users\Brian\.venvs\headroom\Scripts\python -m uvicorn api.main:app --port 8000` (from the `headroom` folder)
 2. Web: `npm run dev` in `web\`, open http://localhost:3000
 3. Insights and market context are cached in `data\cache\`, so the demo does not wait on the models. Upload and "Ask NorthStar" run live (2 to 15 s).
 

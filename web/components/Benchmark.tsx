@@ -38,7 +38,6 @@ export default function Benchmark() {
     ? [...data.rows].sort((a, b) => b.threshold_acc - a.threshold_acc || b.cost_per_doc_usd - a.cost_per_doc_usd)
     : [];
   const errorEntries = data ? Object.entries(data.errors ?? {}).filter(([, errs]) => errs.length > 0) : [];
-  const notes = data?.notes ?? [];
   const title = headline(rows);
 
   return (
@@ -94,13 +93,6 @@ export default function Benchmark() {
           </table>
         )}
       </Card>
-      {notes.length > 0 && (
-        <Card title="What we found">
-          <ul className="list-disc space-y-1.5 pl-5 text-sm leading-relaxed">
-            {notes.map((n, i) => <li key={i}>{n}</li>)}
-          </ul>
-        </Card>
-      )}
       {errorEntries.length > 0 && (
         <Card title="Where open models fell short">
           <div className="space-y-4">

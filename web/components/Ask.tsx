@@ -71,7 +71,7 @@ export default function Ask({ caseName, currency }: { caseName: string; currency
     : "";
 
   return (
-    <Card title="Ask Headroom" aside="An open model answers, the covenant engine does the maths">
+    <Card title="Ask NorthStar" aside="An open model answers, the covenant engine does the maths">
       <form
         onSubmit={(e) => { e.preventDefault(); submit(question); }}
         className="flex gap-2"

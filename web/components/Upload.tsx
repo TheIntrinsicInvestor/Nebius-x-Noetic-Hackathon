@@ -48,7 +48,7 @@ export default function Upload({ onLoad, loading, error }: {
     <div className="grid grid-cols-12 gap-5">
       <div className="col-span-12 lg:col-span-7 space-y-4">
         <p className="text-sm text-muted max-w-xl">
-          Start with a company. Headroom reads the loan agreement, projects the next six quarters and shows how close each
+          Start with a company. NorthStar reads the loan agreement, projects the next six quarters and shows how close each
           covenant is to breaking.
         </p>
         {CASES.map((c) => (

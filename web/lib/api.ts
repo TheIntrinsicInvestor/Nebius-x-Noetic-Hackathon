@@ -18,7 +18,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     res = await fetch(API_BASE + path, init);
   } catch {
-    throw new Error(`Cannot reach the Headroom API at ${API_BASE}. Is the backend running?`);
+    throw new Error(`Cannot reach the NorthStar API at ${API_BASE}. Is the backend running?`);
   }
   if (!res.ok) {
     let detail = "";

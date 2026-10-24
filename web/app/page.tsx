@@ -130,7 +130,7 @@ export default function Home() {
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 py-3">
           <div className="flex items-baseline gap-3">
-            <span className="text-lg font-bold tracking-tight text-accent">Headroom</span>
+            <span className="text-lg font-bold tracking-tight text-accent">NorthStar</span>
             <span className="hidden text-sm text-muted md:inline">See the covenant breach before your bank does.</span>
           </div>
           {caseData && (

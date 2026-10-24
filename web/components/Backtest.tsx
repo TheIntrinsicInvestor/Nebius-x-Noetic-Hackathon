@@ -18,7 +18,7 @@ export default function Backtest() {
   }, []);
 
   return (
-    <Card title="Backtest: would Headroom have seen it coming?" aside="Each row uses only the filings available at that date">
+    <Card title="Backtest: would NorthStar have seen it coming?" aside="Each row uses only the filings available at that date">
       <ErrorNote message={error} />
       {!rows && !error && <p className="text-sm text-muted"><Spinner /> Replaying past quarters...</p>}
       {rows && (
@@ -27,7 +27,7 @@ export default function Backtest() {
             <tr className="text-left text-xs text-muted">
               <th className="pb-2 font-medium">As of</th>
               <th className="pb-2 font-medium">Leverage vs limit</th>
-              <th className="pb-2 font-medium">Headroom predicted first breach</th>
+              <th className="pb-2 font-medium">NorthStar predicted first breach</th>
               <th className="pb-2 font-medium">What actually happened</th>
               <th className="pb-2" />
             </tr>
@@ -67,7 +67,7 @@ export default function Backtest() {
                   {hi && (
                     <tr className="bg-accent-soft">
                       <td colSpan={5} className="border-l-4 border-l-accent px-2 pb-2 text-xs text-accent">
-                        Leverage looked comfortable here, yet Headroom&apos;s forecast already showed the breach coming.
+                        Leverage looked comfortable here, yet NorthStar&apos;s forecast already showed the breach coming.
                       </td>
                     </tr>
                   )}

@@ -26,6 +26,8 @@ interface Row {
   threshold: number;
   p: CovenantPoint;
   off: "high" | "low" | null;
+  /** first point of a run of clipped points: the only one that carries the "off chart" text */
+  offLabel: boolean;
 }
 
 function bounds(kind: string, comparator: string, pts: CovenantPoint[]) {
@@ -58,7 +60,7 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
     const v = isUndefinedRatio(p.value) ? cap * 10 : p.value;
     const off = v > cap ? "high" : v < floor ? "low" : null;
     // keep clipped points just inside the plot so the dot and its label stay visible
-    const inset = (cap - floor) * 0.04;
+    const inset = (cap - floor) * 0.09;
     const shown = off === "high" ? cap - inset : off === "low" ? floor + inset : v;
     return {
       label: quarterLabel(p.period_end),
@@ -67,8 +69,10 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
       threshold: p.threshold,
       p,
       off,
+      offLabel: false,
     };
   });
+  rows.forEach((r, i) => { r.offLabel = !!r.off && (i === 0 || rows[i - 1].off !== r.off); });
 
   const latest = lastActualIdx >= 0 ? pts[lastActualIdx] : null;
   const fc = pts.filter((p) => p.is_forecast);
@@ -88,7 +92,13 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
         <g key={key}>
           <circle cx={cx} cy={cy} r={payload.p.breached ? 4.5 : 3} fill={payload.p.breached ? BREACH : "#fff"} stroke={color} strokeWidth={2} />
           {payload.off && (
-            <text x={cx} y={payload.off === "high" ? cy + 15 : cy - 9} textAnchor="middle" fontSize={10} fill={color} stroke="#fff" strokeWidth={3} paintOrder="stroke">
+            <path
+              d={payload.off === "high" ? `M${cx - 3.5},${cy - 7} L${cx + 3.5},${cy - 7} L${cx},${cy - 12} Z` : `M${cx - 3.5},${cy + 7} L${cx + 3.5},${cy + 7} L${cx},${cy + 12} Z`}
+              fill={color}
+            />
+          )}
+          {payload.offLabel && (
+            <text x={index === rows.length - 1 ? cx - 4 : cx + 4} y={payload.off === "high" ? cy + 17 : cy - 11} textAnchor={index === rows.length - 1 ? "end" : "start"} fontSize={10} fill={color} stroke="#fff" strokeWidth={3} paintOrder="stroke">
               off chart
             </text>
           )}
@@ -118,7 +128,7 @@ export default function HeadroomChart({ kind, comparator, points, currency }: {
                 x2={rows[rows.length - 1].label}
                 fill="#eaf4f8"
                 fillOpacity={1}
-                label={{ value: "Forecast", position: "insideTopRight", fontSize: 10, fill: "#8a979f" }}
+                label={{ value: "Forecast", position: "top", fontSize: 10, fill: "#8a979f" }}
               />
             )}
             <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#5a6a74" }} tickLine={false} axisLine={{ stroke: "#dde3e7" }} interval="preserveStartEnd" minTickGap={8} />

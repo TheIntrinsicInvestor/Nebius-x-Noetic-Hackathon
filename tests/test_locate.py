@@ -34,6 +34,14 @@ def test_prose_fallback_finds_ratio_sentence():
     assert "4.25 to 1.0" in chunks[0].text
 
 
+def test_uk_lma_definitions_found():
+    text = ('"Total Net Debt" means all Borrowings less cash. "Termination Date" means 31 March 2028. '
+            '"Margin" means 3.00 per cent. "Relevant Period" means each period of twelve months. '
+            '21.1 Financial condition. Leverage shall not exceed 3.00:1.')
+    titles = {c.title for c in locate_sections(text)}
+    assert {"Total Net Debt", "Termination Date", "Margin", "Relevant Period"} <= titles
+
+
 def test_no_match_returns_empty():
     assert locate_sections("A lease agreement about a warehouse.") == []
 

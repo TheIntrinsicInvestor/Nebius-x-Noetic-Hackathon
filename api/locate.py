@@ -7,7 +7,9 @@ from bs4 import BeautifulSoup
 COVENANT_RE = re.compile(r"(?i)(financial covenants|section\s+7\.11|7\.11\s)")
 DEF_NAMES = ("Consolidated EBITDA|Consolidated Leverage Ratio|Total Leverage Ratio|Fixed Charge Coverage Ratio|"
              "Consolidated Fixed Charge Coverage Ratio|Consolidated Interest Coverage Ratio|Interest Coverage Ratio|"
-             "Consolidated Net Debt|Maturity Date|Applicable Rate|Revolving Commitment|Measurement Period")
+             "Consolidated Net Debt|Maturity Date|Applicable Rate|Revolving Commitment|Measurement Period|"
+             # UK / LMA-style terms
+             "Total Net Debt|Leverage|Interest Cover|Finance Charges|Termination Date|Margin|Relevant Period")
 DEF_RE = re.compile(r'(?i)[“"](' + DEF_NAMES + r')[”"]\s+(?:means|shall mean)')
 ANY_DEF_RE = re.compile(r'[“"][A-Z][^”"]{1,80}[”"]\s+(?:means|shall mean|has the meaning)')
 PROSE_RE = re.compile(r"(?i)(leverage ratio|coverage ratio|minimum (?:consolidated )?ebitda)")

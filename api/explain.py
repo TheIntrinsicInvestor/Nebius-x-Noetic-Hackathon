@@ -21,7 +21,7 @@ class _Insights(BaseModel):
 
 def _add(v: float, out: set[float]) -> None:
     for x in (v, abs(v)):
-        out.update({round(x, 0), round(x, 1), round(x, 2)})
+        out.update({round(x, 0), round(x, 1), round(x, 2), round(x, 3)})
         if abs(x) <= 1:
             out.update({round(x * 100, 0), round(x * 100, 1)})
 
@@ -39,8 +39,9 @@ def allowed_numbers(obj: Any) -> set[float]:
         elif isinstance(o, str):
             try:
                 walk(date.fromisoformat(o))
-            except ValueError:
-                pass
+            except ValueError:  # labels like "Q1 2027"
+                for tok in NUM_RE.findall(o):
+                    _add(float(tok.replace(",", "").rstrip(".")), out)
         elif isinstance(o, dict):
             for v in o.values():
                 walk(v)

@@ -68,6 +68,15 @@ def test_backtest_flags_q3_2024():
     assert any(r["actual_in_compliance"] is False for r in rows)
 
 
+def test_ask_endpoint_logs_and_returns_answer(monkeypatch):
+    import api.main as m
+    monkeypatch.setattr(m, "ask", lambda case, q: {"answer": "ok", "tool_calls": [], "unverified_numbers": []})
+    r = client.post("/ask", json={"case": "sample_uk", "question": "Can we spend 2m?"})
+    assert r.status_code == 200
+    assert r.json()["answer"] == "ok"
+    assert client.post("/ask", json={"case": "nope", "question": "x"}).status_code == 404
+
+
 def test_agreement_rejects_pdf():
     r = client.post("/agreement", files={"file": ("a.pdf", b"%PDF", "application/pdf")})
     assert r.status_code == 415

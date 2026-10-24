@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from api.cases import DATA, load_case
+from api.copilot import ask
 from api.engine.headroom import Analysis, analyze
 from api.explain import make_insights
 from api.extract_agreement import extract_covenants
@@ -149,6 +150,18 @@ def get_backtest():
 def get_benchmark():
     p = ROOT / "bench" / "results.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"rows": [], "errors": {}}
+
+
+class AskRequest(BaseModel):
+    case: str
+    question: str
+
+
+@app.post("/ask")
+def post_ask(req: AskRequest):
+    _case(req.case)
+    log_outbound(MODEL_SERVICE, "copilot question with engine tool results")
+    return ask(req.case, req.question)
 
 
 @app.get("/market/{name}")

@@ -19,6 +19,11 @@ def test_allowed_handles_lists_and_rounding():
     assert validate_numbers("Leverage reaches 2.49x, or 2.5x, after 18 days", a) == []
 
 
+def test_numbers_inside_strings_and_three_decimals_allowed():
+    a = allowed_numbers({"first_breach": {"quarter": "Q1 2027"}, "headroom_pct": 0.013})
+    assert validate_numbers("breach in Q1 2027, leaving 0.013 headroom (1.3%)", a) == []
+
+
 def test_commas_stripped():
     a = allowed_numbers({"cost": 1250000})
     assert validate_numbers("costs 1,250,000", a) == []

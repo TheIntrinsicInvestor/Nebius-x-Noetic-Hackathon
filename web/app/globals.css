@@ -53,7 +53,8 @@ body {
 }
 
 body {
-  font-family: var(--font-sans);
+  /* not var(--font-sans): Tailwind only emits theme variables that a utility uses, so that var was undefined */
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   font-feature-settings: "cv11", "ss01";
 }
 

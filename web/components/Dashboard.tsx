@@ -48,7 +48,7 @@ export default function Dashboard(p: DashboardProps) {
       <div className="grid grid-cols-12 gap-5">
         <div className="col-span-12 lg:col-span-8 space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-[13px] font-semibold">Covenant tests, actual and next {live.forecast.length || 6} quarters</h2>
+          <h2 className="font-serif text-[17px] font-semibold">Covenant tests, actual and next {live.forecast.length || 6} quarters</h2>
           <ChartLegend />
         </div>
         <div className="grid grid-cols-1 gap-4 xl:grid-cols-2 content-start">
@@ -113,7 +113,7 @@ function Banner({ caseData, a, scenarioOn, showBacktestLink }: {
               {a.budget_until ? `Forecast: your budget to ${quarterLabel(a.budget_until)}, trend after` : "Forecast: trend from your last 4 quarters"}
             </span>
           </div>
-          <h2 className={`mt-1 text-2xl font-semibold tracking-tight ${fb ? "text-breach" : "text-ok"}`}>
+          <h2 className={`mt-1 font-serif text-[28px] font-semibold leading-tight ${fb ? "text-breach" : "text-ok"}`}>
             {fb ? `Projected breach: ${kindShort(fb.kind)} in ${quarterLabel(fb.period_end)}` : `No breach projected in the next ${horizon} quarters`}
           </h2>
           {fb && (

@@ -44,7 +44,7 @@ export default function Benchmark() {
   return (
     <div className="space-y-5">
       <div>
-        {title && <h2 className="text-2xl font-semibold tracking-tight text-accent">{title}</h2>}
+        {title && <h2 className="font-serif text-[28px] font-semibold leading-tight text-accent">{title}</h2>}
         <p className="mt-1 max-w-3xl text-sm text-muted">
           Same prompt, same excerpts, scored against labels drawn verbatim from the source text.
         </p>

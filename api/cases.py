@@ -7,10 +7,13 @@ DATA = Path(__file__).resolve().parent.parent / "data"
 
 META = {
     "nortech": {"name": "nortech", "display_name": "Nortech Systems Inc.", "currency": "$", "unit": "m",
-                "as_of": "2024-09-30",
+                "as_of": "2024-09-30", "sector": "electronics manufacturing", "country": "United States",
+                "lender": "Bank of America", "base_rate": "Term SOFR",
                 "description": "US electronics manufacturer, ~$120m revenue, one bank lender (Bank of America), "
                                "no PE sponsor. Real SEC filings, rewound to Q3 2024 when leverage looked fine."},
     "sample_uk": {"name": "sample_uk", "display_name": "Ashby & Rowe Engineering Ltd", "currency": "£", "unit": "m",
+                  "sector": "engineering manufacturing", "country": "UK", "lender": "UK high street banks",
+                  "base_rate": "SONIA",
                   "description": "Fictional family-owned UK manufacturer, ~£40m revenue, RCF + term loan."},
 }
 

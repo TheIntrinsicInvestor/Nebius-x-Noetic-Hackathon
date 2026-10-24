@@ -11,9 +11,11 @@ from api.engine.headroom import Analysis, analyze
 from api.explain import make_insights
 from api.extract_agreement import extract_covenants
 from api.locate import html_to_text
+from api.market import market_context
 from api.models import CovenantSet, Quarter, Scenario
 
 ROOT = Path(__file__).resolve().parent.parent
+MODEL_SERVICE = "Open model on Nebius Token Factory (deployable in your own environment)"
 CACHE = DATA / "cache"
 OUTBOUND_LOG = CACHE / "outbound_log.json"
 
@@ -96,6 +98,7 @@ def post_analyze(req: AnalyzeRequest):
         if is_default and path.exists():
             insights, cached = json.loads(path.read_text(encoding="utf-8")), True
         else:
+            log_outbound(MODEL_SERVICE, "insight cards from the analysis summary")
             insights = [i.model_dump() for i in make_insights(insight_payload(a, meta, req.scenario))]
             if is_default:
                 CACHE.mkdir(parents=True, exist_ok=True)
@@ -110,6 +113,7 @@ async def post_agreement(file: UploadFile):
         raise HTTPException(415, "upload a .txt or .htm credit agreement")
     raw = (await file.read()).decode("utf-8", errors="replace")
     text = html_to_text(raw) if name.endswith((".htm", ".html")) else raw
+    log_outbound(MODEL_SERVICE, f"covenant extraction from {file.filename}")
     try:
         cs, stats = extract_covenants(text)
     except ValueError as e:
@@ -145,6 +149,18 @@ def get_backtest():
 def get_benchmark():
     p = ROOT / "bench" / "results.json"
     return json.loads(p.read_text(encoding="utf-8")) if p.exists() else {"rows": [], "errors": {}}
+
+
+@app.get("/market/{name}")
+def get_market(name: str):
+    _, _, meta = _case(name)
+    path = CACHE / f"market_{name}.json"
+    if path.exists():
+        return {"items": json.loads(path.read_text(encoding="utf-8")), "cached": True}
+    items = market_context(meta, log_outbound)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(items, indent=1), encoding="utf-8")
+    return {"items": items, "cached": False}
 
 
 @app.get("/outbound")

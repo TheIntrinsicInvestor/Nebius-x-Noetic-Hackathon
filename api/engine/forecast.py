@@ -40,11 +40,12 @@ def project(history: list[Quarter], n: int = 6, sc: Scenario = Scenario(),
     da = _mean([q.da for q in last4])
     capex = _mean([q.capex for q in last4])
     principal = _mean([q.principal_paid for q in last4])
-    dso = _mean([_days(q.receivables, q.revenue) for q in last4]) + sc.dso_delta
-    dio = _mean([_days(q.inventory, q.cogs) for q in last4]) + sc.dio_delta
+    # negative levers model improvements; floor at zero so a big cut cannot go below nothing
+    dso = max(0.0, _mean([_days(q.receivables, q.revenue) for q in last4]) + sc.dso_delta)
+    dio = max(0.0, _mean([_days(q.inventory, q.cogs) for q in last4]) + sc.dio_delta)
     dpo = _mean([_days(q.payables, q.cogs) for q in last4])
     debt4 = sum(q.debt for q in last4)
-    rate = (sum(q.interest_expense for q in last4) / debt4 if debt4 else 0.0) + sc.rate_bp / 1e4 / 4
+    rate = max(0.0, (sum(q.interest_expense for q in last4) / debt4 if debt4 else 0.0) + sc.rate_bp / 1e4 / 4)
 
     plan = {b.period_end: b for b in budget or []}
     base_rev = [q.revenue for q in history]  # revenue path before the scenario shock
@@ -63,7 +64,7 @@ def project(history: list[Quarter], n: int = 6, sc: Scenario = Scenario(),
             ebitda = margin * revenue
             cogs = cogs_ratio * revenue
             q_da, q_principal, q_capex = da, principal, capex
-        q_capex += sc.capex_extra / 4 if k < 4 else 0.0
+        q_capex = max(0.0, q_capex + (sc.capex_extra / 4 if k < 4 else 0.0))
         receivables = dso * revenue / DAYS
         inventory = dio * cogs / DAYS
         payables = dpo * cogs / DAYS

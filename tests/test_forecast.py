@@ -40,6 +40,21 @@ def test_dso_delta_consumes_cash():
     assert base[0].cash - shocked[0].cash == pytest.approx(25 / 91.25 * 10, abs=0.01)
 
 
+def test_improvement_levers_release_cash():
+    base = project(flat_history(), n=2)
+    better = project(flat_history(), n=2, sc=Scenario(dso_delta=-10))
+    assert better[0].cash - base[0].cash == pytest.approx(25 / 91.25 * 10, abs=0.01)
+
+
+def test_improvement_levers_floor_at_zero():
+    # cuts larger than the business can deliver stop at zero days, zero capex, zero rate
+    f = project(flat_history(), n=4, sc=Scenario(dso_delta=-1000, capex_extra=-100, rate_bp=-10000))
+    for q in f:
+        assert q.receivables == 0
+        assert q.capex == 0
+        assert q.interest_expense == 0
+
+
 def test_revolver_draw():
     f = project(flat_history(capex=6), n=4)
     assert min(q.cash for q in f) >= 0

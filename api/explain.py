@@ -69,7 +69,8 @@ SYSTEM = """You are a corporate finance adviser writing for a busy finance direc
 From the JSON analysis, write 3 to 5 short insight cards (title max 8 words, body max 45 words).
 Cover: how much warning they have before the first breach, which covenant binds first, how far EBITDA
 or customer payment days can slip before a breach, the effect of the scenario if one is applied, and
-refinancing timing. Use ONLY numbers that appear in the JSON (you may round them or show fractions as percentages).
+refinancing timing (if talks_overdue is true, say lender talks are overdue). Skip any topic with nothing to say.
+"today" is the analysis date: write as if speaking on that date. Use the definitions given. Use ONLY numbers that appear in the JSON (you may round them or show fractions as percentages).
 Quarters are written like "Q3 2027". No em dashes. Plain English, no jargon without explanation."""
 
 

@@ -24,5 +24,6 @@ def refi_summary(fac: Facility, as_of: date, debt: float) -> dict:
         months = (m.year - as_of.year) * 12 + m.month - as_of.month - (1 if m.day < as_of.day else 0)
         out["months_to_maturity"] = months
         out["start_talks_by"] = _minus_months(m, 12)
+        out["talks_overdue"] = out["start_talks_by"] < as_of
         out["maturity"] = m
     return out

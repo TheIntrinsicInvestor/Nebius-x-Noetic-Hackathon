@@ -1,3 +1,4 @@
+import math
 from datetime import date
 
 from pydantic import BaseModel
@@ -6,6 +7,9 @@ from api.engine.covenants import headroom_pct, metric_value, threshold_at
 from api.engine.forecast import project
 from api.engine.refi import refi_summary
 from api.models import CovenantSet, Quarter, Scenario
+
+
+OFF_CHART = 999.0  # shown value when a ratio is undefined (zero or negative EBITDA)
 
 
 class CovenantPoint(BaseModel):
@@ -42,7 +46,8 @@ def _points(history: list[Quarter], cs: CovenantSet, sc: Scenario, n: int):
                 continue
             v = metric_value(cov, series, i)
             h = headroom_pct(cov, v, thr)
-            points.append(CovenantPoint(period_end=d, kind=cov.kind, value=v, threshold=thr,
+            shown = v if math.isfinite(v) else OFF_CHART  # JSON has no infinity
+            points.append(CovenantPoint(period_end=d, kind=cov.kind, value=shown, threshold=thr,
                                         headroom_pct=h, is_forecast=i >= len(history),
                                         breached=h < 0))
     return points, forecast

@@ -73,6 +73,12 @@ def test_short_history_raises():
         analyze(flat_history()[:3], cs(lev))
 
 
+def test_refi_talks_overdue():
+    r = refi_summary(FAC, date(2027, 1, 31), debt=30)
+    assert r["talks_overdue"] is True
+    assert refi_summary(FAC, date(2026, 1, 31), debt=30)["talks_overdue"] is False
+
+
 def test_refi_summary():
     r = refi_summary(FAC, date(2026, 10, 24), debt=30)
     assert r["months_to_maturity"] == 12

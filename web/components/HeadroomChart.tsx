@@ -182,7 +182,7 @@ function Tip({ row, fmt }: { row: Row; fmt: (v: number) => string }) {
 
 export function ChartLegend() {
   return (
-    <div className="flex items-center gap-3 text-[11px] text-muted">
+    <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted">
       <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={ACCENT} strokeWidth="2" /></svg>Actual</span>
       <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={FORECAST} strokeWidth="2" strokeDasharray="4 3" /></svg>Forecast</span>
       <span className="flex items-center gap-1"><svg width="16" height="6"><line x1="0" y1="3" x2="16" y2="3" stroke={LIMIT} strokeWidth="1.5" /></svg>Limit</span>

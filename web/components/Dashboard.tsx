@@ -35,12 +35,16 @@ export default function Dashboard(p: DashboardProps) {
   const kinds = covenants.covenants.filter((c) => live.points.some((pt) => pt.kind === c.kind));
 
   return (
-    <div className="space-y-5">
+    // pb-16 on phones: room for the floating Ask button
+    <div className="space-y-5 pb-16 sm:pb-0">
       <ErrorNote message={p.error} />
       <Banner caseData={caseData} a={live} scenarioOn={!isZeroScenario(p.scenario)} />
-      <div className="grid grid-cols-12 gap-5">
-        <div className="col-span-12 lg:col-span-8 space-y-3">
-        <div className="flex items-center justify-between">
+      {/* Phones stack charts, then what-if and refinancing, then market news: the left column is
+          display:contents there so its two parts can be ordered around the right column. */}
+      <div className="flex flex-col gap-5 lg:grid lg:grid-cols-12">
+        <div className="contents lg:col-span-8 lg:block lg:space-y-3">
+        <div className="order-1 space-y-3">
+        <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="font-serif text-[17px] font-semibold">Covenant tests, actual and next {live.forecast.length || 6} quarters</h2>
           <ChartLegend />
         </div>
@@ -60,9 +64,10 @@ export default function Dashboard(p: DashboardProps) {
             </div>
           )}
         </div>
-        <Market caseName={caseData.meta.name} rewound={!!caseData.meta.as_of} />
         </div>
-        <div className="col-span-12 lg:col-span-4 space-y-4">
+        <div className="order-3"><Market caseName={caseData.meta.name} rewound={!!caseData.meta.as_of} /></div>
+        </div>
+        <div className="order-2 space-y-4 lg:col-span-4">
           <WhatIf scenario={p.scenario} onChange={p.onScenario} base={p.base} live={live} busy={p.busy} currency={cur} />
           <Refi a={live} currency={cur} />
         </div>
@@ -91,7 +96,7 @@ function Banner({ caseData, a, scenarioOn }: {
   const fall = -rs.ebitda_fall_pct;
 
   return (
-    <section className={`rounded-lg border px-5 py-4 ${fb ? "border-breach/30 bg-breach-soft" : "border-ok/30 bg-ok-soft"}`}>
+    <section className={`rounded-lg border px-4 py-4 sm:px-5 ${fb ? "border-breach/30 bg-breach-soft" : "border-ok/30 bg-ok-soft"}`}>
       <div className="flex flex-wrap items-start justify-between gap-x-8 gap-y-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted">

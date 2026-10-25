@@ -86,12 +86,13 @@ export default function Ask({ caseName, currency, covenants }: { caseName: strin
       <button
         onClick={() => setOpen(true)}
         aria-label="Open Ask NorthStar"
-        className={`fixed right-0 top-1/2 z-40 flex -translate-y-1/2 flex-col items-center gap-2 rounded-l-xl border-l-[3px] border-teal bg-navy px-2 py-4 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition hover:pr-3 ${open ? "pointer-events-none opacity-0" : "opacity-100"}`}
+        // phones: a pill in the bottom corner; from sm up: the vertical tab on the right edge
+        className={`fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-full bg-navy px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-navy/30 transition sm:bottom-auto sm:right-0 sm:top-1/2 sm:-translate-y-1/2 sm:flex-col sm:rounded-none sm:rounded-l-xl sm:border-l-[3px] sm:border-teal sm:px-2 sm:py-4 sm:hover:pr-3 ${open ? "pointer-events-none opacity-0" : "opacity-100"}`}
       >
         <span aria-hidden className="flex h-6 w-6 items-center justify-center rounded-full bg-sky text-navy">
           <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor"><path d="M12 2l2.4 7.6H22l-6.2 4.6 2.4 7.6L12 17.2l-6.2 4.6 2.4-7.6L2 9.6h7.6z" /></svg>
         </span>
-        <span className="[writing-mode:vertical-rl] rotate-180 tracking-wide">Ask NorthStar</span>
+        <span className="tracking-wide sm:rotate-180 sm:[writing-mode:vertical-rl]">Ask NorthStar</span>
       </button>
 
       <aside
@@ -149,7 +150,7 @@ export default function Ask({ caseName, currency, covenants }: { caseName: strin
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask about this company's covenants"
-              className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-sm outline-none focus:border-teal"
+              className="min-w-0 flex-1 rounded-full border border-line bg-canvas px-4 py-2 text-base outline-none focus:border-teal sm:text-sm"
             />
             <button
               type="submit"

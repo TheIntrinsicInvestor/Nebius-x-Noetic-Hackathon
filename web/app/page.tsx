@@ -239,7 +239,18 @@ export default function Landing() {
             </p>
           </Reveal>
           <Reveal delay={0.1}>
-            <div className="overflow-x-auto">
+            {/* phones: one block per model, so the cost column is not scrolled out of view */}
+            <ul className="divide-y divide-line border-y border-ink/80 text-[15px] num sm:hidden">
+              {MODELS.map((m) => (
+                <li key={m.name} className="py-3.5">
+                  <span className="font-semibold">{m.name}</span>
+                  <span className="ml-2 text-sm text-muted">{m.kind}</span>
+                  <div className="mt-1.5 flex justify-between gap-4"><span className="text-muted">Covenants read correctly</span><span>{m.right}</span></div>
+                  <div className="flex justify-between gap-4"><span className="text-muted">Cost per document</span><span className="text-right">{m.cost}</span></div>
+                </li>
+              ))}
+            </ul>
+            <div className="hidden overflow-x-auto sm:block">
               <table className="w-full min-w-[520px] text-left text-[15px] num">
                 <thead>
                   <tr className="border-b border-ink/80 text-sm text-muted">

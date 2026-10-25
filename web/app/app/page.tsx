@@ -114,7 +114,7 @@ export default function Home() {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="bg-navy text-paper">
-        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-6 pb-3 pt-4">
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between gap-4 px-4 pb-3 pt-4 sm:gap-6 sm:px-6">
           <span className="font-serif text-[28px] font-bold leading-none tracking-tight text-white">NorthStar</span>
           {!caseData && (
             <span className="hidden font-serif text-[15px] text-paper md:inline">See the covenant breach before your bank does.</span>
@@ -122,15 +122,16 @@ export default function Home() {
           {caseData && (
             <div className="min-w-0 text-right">
               <div className="truncate font-serif text-base font-semibold text-white">{caseData.meta.display_name}</div>
-              <div className="truncate text-xs text-paper/75 max-w-[560px]">{caseData.meta.description}</div>
-              <div className="truncate text-[11px] text-paper/55 max-w-[560px]">
+              {/* phones keep only the company name */}
+              <div className="hidden truncate text-xs text-paper/75 max-w-[560px] sm:block">{caseData.meta.description}</div>
+              <div className="hidden truncate text-[11px] text-paper/55 max-w-[560px] sm:block">
                 {[caseData.meta.sector, caseData.meta.country, caseData.meta.lender, caseData.meta.base_rate].filter(Boolean).join(" · ")}
               </div>
             </div>
           )}
         </div>
-        <div className="mx-auto max-w-[1400px] px-6"><div className="border-t border-dashed border-paper/35" /></div>
-        <nav className="mx-auto flex max-w-[1400px] gap-1 px-6">
+        <div className="mx-auto max-w-[1400px] px-4 sm:px-6"><div className="border-t border-dashed border-paper/35" /></div>
+        <nav className="mx-auto flex max-w-[1400px] gap-1 px-2 sm:px-6">
           {TABS.map((t, i) => {
             const disabled = needsCase(t.id);
             const active = tab === t.id;
@@ -154,7 +155,7 @@ export default function Home() {
         </nav>
       </header>
 
-      <main className="mx-auto w-full max-w-[1400px] flex-1 px-6 py-6">
+      <main className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-4 sm:px-6 sm:py-6">
         {tab === "upload" && <Upload onLoad={loadCase} loading={loadingCase} error={caseError} />}
         {tab === "review" && covenants && caseData && (
           <Review

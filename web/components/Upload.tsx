@@ -28,7 +28,8 @@ const CATEGORY: Record<string, string> = {
   principal: "Loan repayments", addbacks: "One-off items", other: "Other",
 };
 
-const input = "w-full rounded-md border border-line bg-surface px-3 py-2 text-sm focus:border-accent focus:outline-none";
+// 16px on phones: iOS zooms into any field with smaller text when it is tapped
+const input = "w-full rounded-md border border-line bg-surface px-3 py-2 text-base sm:text-sm focus:border-accent focus:outline-none";
 
 export default function Upload({ onLoad, loading, error }: {
   onLoad: (name: CaseName) => void;
@@ -139,7 +140,7 @@ export default function Upload({ onLoad, loading, error }: {
           </p>
         </div>
         <Card title="1. Company">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Company name"><input className={input} value={name} onChange={(e) => edit(setName)(e.target.value)} placeholder="e.g. Ashby & Rowe Engineering" /></Field>
             <Field label="Sector"><input className={input} value={sector} onChange={(e) => edit(setSector)(e.target.value)} placeholder="e.g. Engineering manufacturing" /></Field>
             <Field label="Country"><input className={input} value={country} onChange={(e) => edit(setCountry)(e.target.value)} placeholder="e.g. UK" /></Field>
@@ -281,7 +282,7 @@ function Drop({ label, hint, accept, file, onFile }: {
     >
       <input type="file" accept={accept} className="sr-only" onChange={(e) => onFile(e.target.files?.[0] ?? null)} />
       <span className="font-medium text-ink">{label}</span>
-      <span className="mt-1 break-all text-xs text-muted">{file ? file.name : `Drop or choose a file (${hint})`}</span>
+      <span className="mt-1 text-xs text-muted [overflow-wrap:anywhere]">{file ? file.name : `Drop or choose a file (${hint})`}</span>
     </label>
   );
 }

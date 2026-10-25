@@ -33,8 +33,9 @@ export default function Review({ covenants, currency, needsInput, edited, onThre
             <button onClick={() => { setResets((r) => r + 1); onReset(); }} className="text-accent hover:underline">Edited: reset to agreement</button>
           ) : "Edit a threshold to test it"}
         >
-          <table className="w-full text-sm">
-            <thead>
+          {/* below md each covenant stacks: name and quote full width, then rule and threshold, then step-downs */}
+          <table className="block w-full text-sm md:table">
+            <thead className="hidden md:table-header-group">
               <tr className="text-left text-xs text-muted">
                 <th className="pb-2 font-medium w-[34%]">Covenant</th>
                 <th className="pb-2 font-medium">Rule</th>
@@ -42,10 +43,10 @@ export default function Review({ covenants, currency, needsInput, edited, onThre
                 <th className="pb-2 font-medium">Step-downs</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="block md:table-row-group">
               {covenants.covenants.map((c, i) => (
-                <tr key={`${c.kind}-${i}`} className={`border-t border-line align-top ${c.threshold == null ? "bg-warn-soft/50" : ""}`}>
-                  <td className="py-3 pr-4">
+                <tr key={`${c.kind}-${i}`} className={`grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 border-t border-line py-3 align-top first:border-t-0 first:pt-0 md:table-row md:py-0 md:first:border-t ${c.threshold == null ? "bg-warn-soft/50" : ""}`}>
+                  <td className="col-span-2 md:py-3 md:pr-4">
                     <div className="font-medium">{kindLabel(c.kind)}</div>
                     <div className="text-xs text-muted">
                       Tested {c.test_frequency}, trailing {c.measurement_quarters} quarters
@@ -54,8 +55,8 @@ export default function Review({ covenants, currency, needsInput, edited, onThre
                     </div>
                     <Quote text={c.source_quote} />
                   </td>
-                  <td className="py-3 pr-4 text-muted whitespace-nowrap">{comparatorLabel(c.comparator)}</td>
-                  <td className="py-3 pr-4">
+                  <td className="text-muted whitespace-nowrap md:py-3 md:pr-4">{comparatorLabel(c.comparator)}</td>
+                  <td className="md:py-3 md:pr-4">
                     <ThresholdInput
                       key={`${c.kind}-${i}-${resets}`}
                       value={c.threshold}
@@ -64,7 +65,8 @@ export default function Review({ covenants, currency, needsInput, edited, onThre
                       onCommit={(v) => onThreshold(i, v)}
                     />
                   </td>
-                  <td className="py-3 text-xs text-muted num">
+                  <td className="col-span-2 text-xs text-muted num md:py-3">
+                    <span className="block font-medium md:hidden">Step-downs</span>
                     {c.step_downs.length === 0 ? "None" : (
                       <ul className="space-y-0.5">
                         {c.step_downs.map((s) => (
@@ -128,7 +130,7 @@ function ThresholdInput({ value, prefix, suffix, onCommit }: {
           const v = e.target.value === "" ? null : parseFloat(e.target.value);
           if (v === null || Number.isFinite(v)) onCommit(v);
         }}
-        className="w-16 bg-transparent text-right font-semibold num outline-none"
+        className="w-16 bg-transparent text-right text-base font-semibold num outline-none md:text-sm"
       />
       <span className="text-muted">{suffix}</span>
     </label>

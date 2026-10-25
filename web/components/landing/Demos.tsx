@@ -41,8 +41,9 @@ export function WhatIfDemo() {
   const fc: [number, number][] = [[8, ACTUAL[8]], ...s.forecast.map((v, j) => [9 + j, v] as [number, number])];
   const limitPath = `M${x(0)},${y(3.25)} L${x(8.5)},${y(3.25)} L${x(8.5)},${y(2.5)} L${x(14)},${y(2.5)}`;
   return (
-    <div className="rounded-lg border border-line bg-surface p-5 shadow-[0_24px_60px_-28px_rgba(14,39,66,0.35)]">
-      <div className="h-[64px]">
+    <div className="rounded-lg border border-line bg-surface p-4 shadow-[0_24px_60px_-28px_rgba(14,39,66,0.35)] sm:p-5">
+      {/* taller on phones, where the headline wraps to two lines */}
+      <div className="h-[84px] sm:h-[64px]">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={firstBreach >= 0 ? "breach" : "clear"}
@@ -51,12 +52,12 @@ export function WhatIfDemo() {
           >
             {firstBreach >= 0 ? (
               <>
-                <div className="font-serif text-[22px] font-semibold text-breach">Projected breach: Leverage in Q4 2026</div>
+                <div className="font-serif text-[20px] font-semibold leading-snug text-breach sm:text-[22px]">Projected breach: Leverage in Q4 2026</div>
                 <div className="text-sm text-muted num">Forecast {s.forecast[firstBreach].toFixed(2)}x against a 2.50x limit</div>
               </>
             ) : (
               <>
-                <div className="font-serif text-[22px] font-semibold text-ok">No breach projected in the next 6 quarters</div>
+                <div className="font-serif text-[20px] font-semibold leading-snug text-ok sm:text-[22px]">No breach projected in the next 6 quarters</div>
                 <div className="text-sm text-muted num">Lowest headroom 2% in Q4 2026</div>
               </>
             )}
@@ -64,7 +65,8 @@ export function WhatIfDemo() {
         </AnimatePresence>
       </div>
 
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full" role="img" aria-label="Leverage forecast falling below the 2.50x limit as customers pay faster">
+      {/* the viewBox scales to about half size on a phone, so axis labels are drawn larger there */}
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full max-sm:[&_text]:text-[18px]" role="img" aria-label="Leverage forecast falling below the 2.50x limit as customers pay faster">
         <rect x={x(8.5)} y={PT} width={x(14) - x(8.5) + PR} height={H - PT - PB} fill="#eaf4f8" />
         <text x={x(8.5) + 6} y={PT + 12} fontSize="11" fill="#8a979f">Forecast</text>
         {[2, 2.5, 3, 3.5].map((v) => (

@@ -302,6 +302,9 @@ def get_market(name: str, request: Request):
     path = CACHE / f"market_{name}.json"
     if path.exists():
         return {"items": json.loads(path.read_text(encoding="utf-8")), "cached": True}
+    # the hosted demo has no Tavily key either: cached news only
+    if not os.environ.get("TAVILY_API_KEY"):
+        raise HTTPException(503, "The Tavily API key has been disconnected, so live market news isn't available on the demo.")
     rate_limit(request, RATE_FILE)
     items = market_context(meta, log_outbound)
     CACHE.mkdir(parents=True, exist_ok=True)

@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 
 from api.main import app
@@ -111,6 +112,19 @@ def test_without_the_model_key_ask_and_agreement_say_disconnected(monkeypatch):
     assert "Token Factory API key has been disconnected" in r.json()["detail"]
     r = client.post("/agreement", files={"file": ("a.txt", b"Leverage shall not exceed 3.00x", "text/plain")})
     assert r.status_code == 503
+
+
+def test_without_the_search_key_market_serves_cache_only(monkeypatch, tmp_path):
+    import api.main as m
+    monkeypatch.delenv("TAVILY_API_KEY", raising=False)
+    monkeypatch.setattr(m, "CACHE", tmp_path)
+    monkeypatch.setattr(m, "market_context", lambda *a: pytest.fail("Tavily must not be called"))
+    r = client.get("/market/nortech")
+    assert r.status_code == 503
+    assert "Tavily API key has been disconnected" in r.json()["detail"]
+    (tmp_path / "market_nortech.json").write_text('[{"query": "q", "answer": "a", "sources": []}]', encoding="utf-8")
+    r = client.get("/market/nortech")
+    assert r.status_code == 200 and r.json()["cached"] is True
 
 
 def test_agreement_rejects_unsupported_types():

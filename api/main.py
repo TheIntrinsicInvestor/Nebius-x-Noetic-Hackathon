@@ -63,6 +63,16 @@ def model_service_error(_, e: openai.APIError):
         "detail": "The open model service (Nebius Token Factory) is temporarily unavailable. Try again in a moment."})
 
 
+def require_model(consequence: str) -> None:
+    """The hosted demo runs without NEBIUS_API_KEY so visitors cannot spend it; say so before any outbound call."""
+    if not os.environ.get("NEBIUS_API_KEY"):
+        raise HTTPException(503, f"The Token Factory API key has been disconnected, so {consequence}")
+
+
+UPLOADS_OFF = ("new uploads can't be analysed on the live demo. To see a cached run, press "
+               "\"Autofill with sample data\" below, then Analyse.")
+
+
 DEFINITIONS = {
     "leverage": "debt (net of cash if the agreement says so) / EBITDA over the last 4 quarters; must stay below the limit",
     "interest_cover": "EBITDA / interest over the last 4 quarters; must stay above the limit",
@@ -150,6 +160,7 @@ def post_analyze(req: AnalyzeRequest, request: Request):
         if is_default and path.exists():
             insights, cached = json.loads(path.read_text(encoding="utf-8")), True
         else:
+            require_model("insights can't be generated on the live demo.")
             rate_limit(request, RATE_FILE)
             log_outbound(MODEL_SERVICE, "insight cards from the analysis summary")
             insights = [i.model_dump() for i in with_fallback(make_insights, insight_payload(a, meta, req.scenario))]
@@ -177,6 +188,7 @@ async def post_agreement(file: UploadFile, request: Request):
     name = (file.filename or "").lower()
     if not name.endswith(AGREEMENT_TYPES):
         raise HTTPException(415, "upload the credit agreement as .pdf, .htm or .txt")
+    require_model(UPLOADS_OFF)
     data = await file.read()
     try:
         text = agreement_text(name, data)
@@ -203,6 +215,7 @@ async def post_company(request: Request, agreement: UploadFile, financials: Uplo
     b_name = (budget.filename or "").lower() if budget else ""
     if budget and not b_name.endswith(TABLE_TYPES):
         raise HTTPException(415, "upload the budget as .xlsx or .pdf")
+    require_model(UPLOADS_OFF)
     a_data = await agreement.read()
     data = await financials.read()
     b_data = await budget.read() if budget else None
@@ -277,6 +290,7 @@ class AskRequest(BaseModel):
 @app.post("/ask")
 def post_ask(req: AskRequest, request: Request):
     _case(req.case)
+    require_model("questions can't be answered on the live demo.")
     rate_limit(request, RATE_FILE)
     log_outbound(MODEL_SERVICE, "copilot question with engine tool results")
     return with_fallback(ask, req.case, req.question, req.covenants)

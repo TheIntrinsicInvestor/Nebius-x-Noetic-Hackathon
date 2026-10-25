@@ -28,6 +28,8 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     } catch {
       // body was not JSON
     }
+    // 503 = the hosted demo's model key is disconnected; its message is written for the visitor, so show it as is
+    if (res.status === 503 && detail) throw new Error(detail);
     throw new Error(`API error ${res.status}${detail ? `: ${detail}` : ""}`);
   }
   return (await res.json()) as T;

@@ -89,6 +89,30 @@ def test_backtest_row_explains_suspended_tests():
     assert "suspended" in row["note"]
 
 
+def test_without_the_model_key_uploads_say_disconnected_and_point_to_the_sample(monkeypatch):
+    import api.main as m
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    called = []
+    monkeypatch.setattr(m, "extract_covenants", lambda *a, **k: called.append("model"))
+    monkeypatch.setattr(m, "log_outbound", lambda *a: called.append("log"))
+    files = {"agreement": ("a.txt", b"Leverage shall not exceed 3.00x", "text/plain"),
+             "financials": ("f.xlsx", b"PK", "application/octet-stream")}
+    r = client.post("/company", data={"name": "Test Co"}, files=files)
+    assert r.status_code == 503
+    assert "Token Factory API key has been disconnected" in r.json()["detail"]
+    assert "Autofill with sample data" in r.json()["detail"]
+    assert called == []  # no model call and nothing logged as sent
+
+
+def test_without_the_model_key_ask_and_agreement_say_disconnected(monkeypatch):
+    monkeypatch.delenv("NEBIUS_API_KEY", raising=False)
+    r = client.post("/ask", json={"case": "sample_uk", "question": "Can we spend 2m?"})
+    assert r.status_code == 503
+    assert "Token Factory API key has been disconnected" in r.json()["detail"]
+    r = client.post("/agreement", files={"file": ("a.txt", b"Leverage shall not exceed 3.00x", "text/plain")})
+    assert r.status_code == 503
+
+
 def test_agreement_rejects_unsupported_types():
     r = client.post("/agreement", files={"file": ("a.docx", b"PK", "application/octet-stream")})
     assert r.status_code == 415
